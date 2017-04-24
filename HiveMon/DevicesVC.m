@@ -124,13 +124,16 @@
                 cell.accessoryView = busyLoading;
                 return cell;
 #endif
-    
+
     Peripheral *p = [discoveredPeripherals
                      objectAtIndex:indexPath.row];
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%20@  %3@  %@",
+    cell.textLabel.text = [NSString stringWithFormat:@"%20@  %3@ %3.0f%%  %3d°  %2d%%  %@",
                            [discoveredPeripherals keyAtIndex:indexPath.row],
                            p.rssi,
+                           [p battery],
+                           [p temperature],
+                           [p humidity],
                            [p isScale] ? @"Scale" : @"Sensor"];
     cell.textLabel.textAlignment = NSTextAlignmentLeft;
     

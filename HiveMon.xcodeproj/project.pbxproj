@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		FB03B6491EAE8C5600954A00 /* Peripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B6481EAE8C5600954A00 /* Peripheral.m */; };
 		FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */; };
+		FB03B64F1EAEA81700954A00 /* BMData.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64E1EAEA81700954A00 /* BMData.m */; };
 		FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59EE1EAE5EAC00DFE11A /* main.m */; };
 		FB3B59F21EAE5EAC00DFE11A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59F11EAE5EAC00DFE11A /* AppDelegate.m */; };
 		FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */; };
@@ -22,6 +23,8 @@
 		FB03B6481EAE8C5600954A00 /* Peripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Peripheral.m; sourceTree = "<group>"; };
 		FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderedDictionary.h; sourceTree = "<group>"; };
 		FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderedDictionary.m; sourceTree = "<group>"; };
+		FB03B64D1EAEA81700954A00 /* BMData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMData.h; sourceTree = "<group>"; };
+		FB03B64E1EAEA81700954A00 /* BMData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BMData.m; sourceTree = "<group>"; };
 		FB3B59EA1EAE5EAC00DFE11A /* HiveMon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiveMon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB3B59EE1EAE5EAC00DFE11A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FB3B59F01EAE5EAC00DFE11A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -75,6 +78,8 @@
 				FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */,
 				FB3B5A081EAE706500DFE11A /* BlueToothMGR.h */,
 				FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */,
+				FB03B64D1EAEA81700954A00 /* BMData.h */,
+				FB03B64E1EAEA81700954A00 /* BMData.m */,
 				FB03B6471EAE8C5600954A00 /* Peripheral.h */,
 				FB03B6481EAE8C5600954A00 /* Peripheral.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
@@ -172,6 +177,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB03B64F1EAEA81700954A00 /* BMData.m in Sources */,
 				FB3B59F21EAE5EAC00DFE11A /* AppDelegate.m in Sources */,
 				FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */,
 				FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */,

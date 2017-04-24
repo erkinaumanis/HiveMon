@@ -22,5 +22,8 @@
 - (BOOL) isBroodMinder;
 - (BOOL) isScale;
 - (NSString *) internalName;
+- (float) battery;
+- (int) temperature;
+- (int) humidity;
 
 @end

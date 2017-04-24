@@ -99,7 +99,7 @@ typedef struct bm_adv_resp {
 
 // magic to convert temperature field to degress F
 
-inline int
+int
 bm_f(u_short tr) {
     double c = (double)tr / (double)0x10000 * 165.0 - 40.0;
     int f = c * (9.0/5.0) + 32.0;
@@ -109,7 +109,7 @@ bm_f(u_short tr) {
 
 // similar magic for weights
 
-inline double
+double
 bm_w(uint8_t *b) {
     return (*(b+1) * 256.0 + *b - 32767.0)/100.0;
 }
@@ -138,6 +138,39 @@ bm_w(uint8_t *b) {
     return YES;
 }
 
+- (int) temperature {
+    NSData *manData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
+    bm_adv_resp *bm_adv = (bm_adv_resp *)manData.bytes;
+    switch (bm_adv->bm_devmajor) {
+        case 1:
+            return USHORT(bm_adv->v1.bm_temp);
+        case 2:
+            return bm_f(USHORT(bm_adv->v2.bm_temp));
+    }
+    return 100;
+}
+
+- (int) humidity {
+    NSData *manData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
+    bm_adv_resp *bm_adv = (bm_adv_resp *)manData.bytes;
+    return bm_adv->v2.bm_humidity;
+ }
+
+- (float) battery {
+    NSData *manData = [advertisementData objectForKey:CBAdvertisementDataManufacturerDataKey];
+    bm_adv_resp *bm_adv = (bm_adv_resp *)manData.bytes;
+    switch (bm_adv->bm_devmajor) {
+        case 1:
+            return bm_adv->v1.bm_battery;
+        case 2:
+            return bm_adv->v2.bm_battery;
+        default:
+            NSLog(@"        unknown Broodminder version %d",
+                  bm_adv->bm_devmajor);
+    }
+    return 200;
+}
+
 - (NSString *) internalName {
     NSString *name = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
     if (!name) {
@@ -155,7 +188,7 @@ bm_w(uint8_t *b) {
     else if (buf->bm_model == BM_SENSOR)
         return NO;
 
-    printf("Unknown Broodminder device: 0x%.02    ",
+    NSLog(@"Unknown Broodminder device: 0x%.02x",
            buf->bm_model & 0xff);
     return NO;
 }
