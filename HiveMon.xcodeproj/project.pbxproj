@@ -22,6 +22,7 @@
 		FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DevicesVC.m; sourceTree = "<group>"; };
 		FB3B59FC1EAE5EAC00DFE11A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB3B5A011EAE5EAD00DFE11A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FB3B5A071EAE677000DFE11A /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +60,7 @@
 				FB3B59F31EAE5EAC00DFE11A /* DevicesVC.h */,
 				FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */,
 				FB3B59FC1EAE5EAC00DFE11A /* Assets.xcassets */,
+				FB3B5A071EAE677000DFE11A /* Defines.h */,
 				FB3B5A011EAE5EAD00DFE11A /* Info.plist */,
 				FB3B59ED1EAE5EAC00DFE11A /* Supporting Files */,
 			);
