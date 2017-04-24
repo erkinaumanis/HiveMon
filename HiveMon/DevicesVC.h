@@ -1,5 +1,5 @@
 //
-//  SecondViewController.h
+//  DevicesVC.h
 //  HiveMon
 //
 //  Created by ches on 17/4/24.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SecondViewController : UIViewController
+@interface DevicesVC : UITableViewController
 
 
 @end
