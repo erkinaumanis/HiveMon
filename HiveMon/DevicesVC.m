@@ -8,18 +8,23 @@
 
 #import "Defines.h"
 #import "DevicesVC.h"
+#import "OrderedDictionary.h"
 
 @interface DevicesVC ()
+
+@property (strong, nonatomic)   OrderedDictionary *discoveredPeripherals;
 
 @end
 
 @implementation DevicesVC
 
 @synthesize blueToothMGR;
+@synthesize discoveredPeripherals;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
+        discoveredPeripherals = [[OrderedDictionary alloc] init];
     }
     return self;
 }
@@ -29,6 +34,7 @@
     
     self.title = @"Devices";
     
+    blueToothMGR.delegate = self;
     [blueToothMGR startScan];
 }
 
@@ -53,7 +59,13 @@
 }
 
 - (void) discoveredBM: (Peripheral *)reportedP {
-    NSLog(@"%s: %@", __PRETTY_FUNCTION__, reportedP);
+    NSString *internalName = [reportedP internalName];
+    if ([discoveredPeripherals objectForKey:internalName]) {
+        NSLog(@"Duplicate, ignoring: %@", internalName);
+        return;
+    }
+    [discoveredPeripherals addObject:reportedP withKey:internalName];
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -67,14 +79,14 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 1;   // XXXX
+    return 1;
 }
 
 #ifdef notdef
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return [discoveredPeripherals count];
+}
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     switch (section) {
         case EnvelopeInCloudSection:
@@ -88,11 +100,11 @@
 #endif
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;   // XXXX
+    return [discoveredPeripherals count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *CellIdentifier = @"EnvelopeCell";
+    static NSString *CellIdentifier = @"DeviceCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
@@ -113,7 +125,13 @@
                 return cell;
 #endif
     
-    cell.textLabel.text = @"XXXX";
+    Peripheral *p = [discoveredPeripherals
+                     objectAtIndex:indexPath.row];
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"%20@  %3@  %@",
+                           [discoveredPeripherals keyAtIndex:indexPath.row],
+                           p.rssi,
+                           [p isScale] ? @"Scale" : @"Sensor"];
     cell.textLabel.textAlignment = NSTextAlignmentLeft;
     
     cell.accessoryView = nil;

@@ -12,11 +12,15 @@
 @interface Peripheral : NSObject {
     CBPeripheral *peripheral;
     NSDictionary<NSString *,id> *advertisementData;
+    NSNumber *rssi;
 }
 
 @property (strong, nonatomic)   CBPeripheral *peripheral;
 @property (strong, nonatomic)   NSDictionary<NSString *,id> *advertisementData;
+@property (strong, nonatomic)   NSNumber *rssi;
 
 - (BOOL) isBroodMinder;
+- (BOOL) isScale;
+- (NSString *) internalName;
 
 @end

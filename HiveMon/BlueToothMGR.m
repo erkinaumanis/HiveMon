@@ -75,6 +75,7 @@
     Peripheral *pReported = [[Peripheral alloc] init];
     pReported.peripheral = peripheral;
     pReported.advertisementData = advertisementData;
+    pReported.rssi = RSSI;
     if (![pReported isBroodMinder]) {
         return;
     }

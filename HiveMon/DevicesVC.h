@@ -10,7 +10,7 @@
 #import "BlueToothMGR.h"
 
 @interface DevicesVC : UITableViewController
-    <UITableViewDelegate, BlueDelegate> {
+    <UITableViewDelegate, UITableViewDataSource, BlueDelegate> {
     BlueToothMGR *blueToothMGR;
 }
 
