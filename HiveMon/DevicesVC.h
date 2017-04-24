@@ -7,11 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BlueToothMGR.h"
 
 @interface DevicesVC : UITableViewController
-    <UITableViewDelegate>;
+    <UITableViewDelegate, BlueDelegate> {
+    BlueToothMGR *blueToothMGR;
+}
 
-
+@property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
 
 @end
 

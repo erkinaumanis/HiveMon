@@ -10,6 +10,8 @@
 #define Defines_h
 
 
+#define kBlueToothRestoreKey    @"BlueToothRestoreKey"
+
 #define USED(x) ((void)(x))
 
 // view tools

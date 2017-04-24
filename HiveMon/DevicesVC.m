@@ -15,6 +15,8 @@
 
 @implementation DevicesVC
 
+@synthesize blueToothMGR;
+
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
@@ -26,7 +28,8 @@
     [super viewDidLoad];
     
     self.title = @"Devices";
-
+    
+    [blueToothMGR startScan];
 }
 
 
@@ -47,6 +50,10 @@
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+}
+
+- (void) discoveredBM: (Peripheral *)reportedP {
+    NSLog(@"%s: %@", __PRETTY_FUNCTION__, reportedP);
 }
 
 - (void)didReceiveMemoryWarning {

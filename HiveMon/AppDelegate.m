@@ -8,10 +8,12 @@
 
 #import "AppDelegate.h"
 #import "DevicesVC.h"
+#import "BlueToothMGR.h"
 
 @interface AppDelegate ()
 
 @property (strong, nonatomic)   DevicesVC *devicesVC;
+@property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
 
 @end
 
@@ -23,6 +25,7 @@
 @synthesize persistentStoreCoordinator;
 @synthesize navController;
 @synthesize devicesVC;
+@synthesize blueToothMGR;
 
 - (BOOL)application:(UIApplication *)application
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -34,8 +37,10 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc]
                    initWithFrame:[[UIScreen mainScreen]
                                   bounds]];
+    self.blueToothMGR = [[BlueToothMGR alloc] init];
     devicesVC = [[DevicesVC alloc]
                    initWithStyle:UITableViewStyleGrouped];
+    devicesVC.blueToothMGR = self.blueToothMGR;
     self.navController = [[UINavigationController alloc]
                           initWithRootViewController: devicesVC];
     self.window.rootViewController = navController;
