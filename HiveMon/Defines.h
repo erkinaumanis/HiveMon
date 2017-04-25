@@ -12,6 +12,8 @@
 
 #define kBlueToothRestoreKey    @"BlueToothRestoreKey"
 
+#define APIARIES_ARCHIVE        @"Apiaries"
+
 #define USED(x) ((void)(x))
 
 // view tools

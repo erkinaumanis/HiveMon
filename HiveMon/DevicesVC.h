@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "BlueToothMGR.h"
+#import "LocationMGR.h"
 
 @interface DevicesVC : UITableViewController
-    <UITableViewDelegate, UITableViewDataSource, BlueDelegate> {
+    <UITableViewDelegate, UITableViewDataSource, BlueDelegate,
+    AwaitLocationData> {
     BlueToothMGR *blueToothMGR;
 }
 

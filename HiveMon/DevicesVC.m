@@ -9,10 +9,15 @@
 #import "Defines.h"
 #import "DevicesVC.h"
 #import "OrderedDictionary.h"
+#import "Apiary.h"
+
 
 @interface DevicesVC ()
 
 @property (strong, nonatomic)   OrderedDictionary *discoveredPeripherals;
+@property (strong, nonatomic)   CLLocation *currentLocation;
+@property (strong, nonatomic)   Apiary *currentApiary;
+@property (strong, nonatomic)   NSMutableArray *apiaries;
 
 @end
 
@@ -20,13 +25,33 @@
 
 @synthesize blueToothMGR;
 @synthesize discoveredPeripherals;
+@synthesize currentLocation;
+@synthesize currentApiary;
+@synthesize apiaries;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
         discoveredPeripherals = [[OrderedDictionary alloc] init];
+        currentLocation = nil;
+        currentApiary = nil;
+        NSData *apiariesData = [NSKeyedUnarchiver unarchiveObjectWithFile:APIARIES_ARCHIVE];
+        if (apiariesData) {
+            apiaries = [NSKeyedUnarchiver unarchiveObjectWithData:apiariesData];
+        } else {
+            apiaries = [[NSMutableArray alloc] init];
+            [self updateApiaries];
+        }
     }
     return self;
+}
+
+- (void) updateApiaries {
+    NSData *apiariesData = [NSKeyedArchiver
+                            archivedDataWithRootObject:apiaries];
+    if (![NSKeyedArchiver archiveRootObject:apiariesData
+                                     toFile:APIARIES_ARCHIVE])
+        NSLog(@"apiary save failed");
 }
 
 - (void)viewDidLoad {
@@ -35,9 +60,29 @@
     self.title = @"Devices";
     
     blueToothMGR.delegate = self;
-    [blueToothMGR startScan];
+    [locationMGR awaitLocationData:self];
 }
 
+- (void) locationDataAvailable: (CLLocation *)location {
+    if (location == nil) {  // no location data at this time
+        if (locationMGR.locationDenied) {  // never available
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Location data disabled"
+                                                                           message:@"This app requires it"
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* defaultAction = [UIAlertAction
+                                            actionWithTitle:@"Enable and try again"
+                                            style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * action) {}
+                                            ];
+            [alert addAction:defaultAction];
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        return;
+    }
+    currentLocation = location;
+    [blueToothMGR startScan];
+}
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];

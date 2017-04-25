@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */; };
 		FB03B64F1EAEA81700954A00 /* BMData.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64E1EAEA81700954A00 /* BMData.m */; };
+		FB03B6521EAF782700954A00 /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B6511EAF782700954A00 /* Device.m */; };
+		FB03B6551EAF785E00954A00 /* Hive.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B6541EAF785E00954A00 /* Hive.m */; };
+		FB03B6581EAF786800954A00 /* Apiary.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B6571EAF786800954A00 /* Apiary.m */; };
+		FB03B65A1EAF78EB00954A00 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB03B6591EAF78EB00954A00 /* CoreLocation.framework */; };
+		FB03B65D1EAF80F600954A00 /* LocationMGR.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B65C1EAF80F600954A00 /* LocationMGR.m */; };
 		FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59EE1EAE5EAC00DFE11A /* main.m */; };
 		FB3B59F21EAE5EAC00DFE11A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59F11EAE5EAC00DFE11A /* AppDelegate.m */; };
 		FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */; };
@@ -22,6 +27,15 @@
 		FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderedDictionary.m; sourceTree = "<group>"; };
 		FB03B64D1EAEA81700954A00 /* BMData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMData.h; sourceTree = "<group>"; };
 		FB03B64E1EAEA81700954A00 /* BMData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BMData.m; sourceTree = "<group>"; };
+		FB03B6501EAF782700954A00 /* Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
+		FB03B6511EAF782700954A00 /* Device.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
+		FB03B6531EAF785E00954A00 /* Hive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hive.h; sourceTree = "<group>"; };
+		FB03B6541EAF785E00954A00 /* Hive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hive.m; sourceTree = "<group>"; };
+		FB03B6561EAF786800954A00 /* Apiary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Apiary.h; sourceTree = "<group>"; };
+		FB03B6571EAF786800954A00 /* Apiary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Apiary.m; sourceTree = "<group>"; };
+		FB03B6591EAF78EB00954A00 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		FB03B65B1EAF80F600954A00 /* LocationMGR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationMGR.h; sourceTree = "<group>"; };
+		FB03B65C1EAF80F600954A00 /* LocationMGR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationMGR.m; sourceTree = "<group>"; };
 		FB3B59EA1EAE5EAC00DFE11A /* HiveMon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiveMon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB3B59EE1EAE5EAC00DFE11A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FB3B59F01EAE5EAC00DFE11A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -41,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB03B65A1EAF78EB00954A00 /* CoreLocation.framework in Frameworks */,
 				FB3B5A0D1EAE71E800DFE11A /* CoreBluetooth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -73,8 +88,16 @@
 				FB3B59F11EAE5EAC00DFE11A /* AppDelegate.m */,
 				FB3B59F31EAE5EAC00DFE11A /* DevicesVC.h */,
 				FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */,
+				FB03B6501EAF782700954A00 /* Device.h */,
+				FB03B6511EAF782700954A00 /* Device.m */,
+				FB03B6531EAF785E00954A00 /* Hive.h */,
+				FB03B6541EAF785E00954A00 /* Hive.m */,
+				FB03B6561EAF786800954A00 /* Apiary.h */,
+				FB03B6571EAF786800954A00 /* Apiary.m */,
 				FB3B5A081EAE706500DFE11A /* BlueToothMGR.h */,
 				FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */,
+				FB03B65B1EAF80F600954A00 /* LocationMGR.h */,
+				FB03B65C1EAF80F600954A00 /* LocationMGR.m */,
 				FB03B64D1EAEA81700954A00 /* BMData.h */,
 				FB03B64E1EAEA81700954A00 /* BMData.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
@@ -97,6 +120,7 @@
 		FB3B5A0B1EAE71E800DFE11A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FB03B6591EAF78EB00954A00 /* CoreLocation.framework */,
 				FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */,
 			);
 			name = Frameworks;
@@ -177,6 +201,10 @@
 				FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */,
 				FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */,
 				FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */,
+				FB03B65D1EAF80F600954A00 /* LocationMGR.m in Sources */,
+				FB03B6551EAF785E00954A00 /* Hive.m in Sources */,
+				FB03B6521EAF782700954A00 /* Device.m in Sources */,
+				FB03B6581EAF786800954A00 /* Apiary.m in Sources */,
 				FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
