@@ -7,9 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
+
+typedef enum BMdevice_t {
+    BMScale,
+    BMSensor,
+    BMUnknown,
+} BMdevice_t;
 
 @interface BMData : NSObject {
+    CBPeripheral *peripheral;
     NSDate *timeStamp;
+    NSNumber *rssi;
+    BMdevice_t type;
     int battery;
     int samples;
     int temperature;
@@ -18,12 +28,20 @@
     int rightWeight;    // ... only
 }
 
-@property (strong, nonatomic)  NSDate *timeStamp;
-@property (assign)  int battery;
-@property (assign)  int samples;
-@property (assign)  int temperature;
-@property (assign)  int humidity;
-@property (assign)  int leftWeight;
-@property (assign)  int rightWeight;
+@property (strong, nonatomic)   CBPeripheral *peripheral;
+@property (strong, nonatomic)   NSDate *timeStamp;
+@property (strong, nonatomic)   NSNumber *rssi;
+@property (assign)              BMdevice_t type;
+@property (assign)              int battery;
+@property (assign)              int samples;
+@property (assign)              int temperature;
+@property (assign)              int humidity;
+@property (assign)              int leftWeight;
+@property (assign)              int rightWeight;
+
+- (id)initFrom: (NSDictionary <NSString *,id> *)advertisementData
+        inPeripheral:(CBPeripheral *) p;
+- (NSString *) internalName;
+- (BOOL) isScale;
 
 @end

@@ -70,20 +70,17 @@
  didDiscoverPeripheral:(CBPeripheral *)peripheral
      advertisementData:(NSDictionary<NSString *,id> *)advertisementData
                   RSSI:(NSNumber *)RSSI {
-//    NSString *name = peripheral.name;
     
-    Peripheral *pReported = [[Peripheral alloc] init];
-    pReported.peripheral = peripheral;
-    pReported.advertisementData = advertisementData;
-    pReported.rssi = RSSI;
-    if (![pReported isBroodMinder]) {
+    BMData *data = [[BMData alloc] initFrom:advertisementData
+                               inPeripheral:peripheral];
+    if (!data)
         return;
-    }
+    data.rssi = RSSI;
 
 //    NSUUID *appleID = peripheral.identifier;
 //    NSLog(@"%@  %3@  %@", appleID, RSSI, name);
 //    NSLog(@"   ad: %@", advertisementData);
-    [delegate discoveredBM:pReported];
+    [delegate newData:data];
 }
 
 - (void)centralManager:(CBCentralManager *)central

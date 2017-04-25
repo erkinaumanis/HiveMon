@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FB03B6491EAE8C5600954A00 /* Peripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B6481EAE8C5600954A00 /* Peripheral.m */; };
 		FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */; };
 		FB03B64F1EAEA81700954A00 /* BMData.m in Sources */ = {isa = PBXBuildFile; fileRef = FB03B64E1EAEA81700954A00 /* BMData.m */; };
 		FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B59EE1EAE5EAC00DFE11A /* main.m */; };
@@ -19,8 +18,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FB03B6471EAE8C5600954A00 /* Peripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Peripheral.h; sourceTree = "<group>"; };
-		FB03B6481EAE8C5600954A00 /* Peripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Peripheral.m; sourceTree = "<group>"; };
 		FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderedDictionary.h; sourceTree = "<group>"; };
 		FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderedDictionary.m; sourceTree = "<group>"; };
 		FB03B64D1EAEA81700954A00 /* BMData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMData.h; sourceTree = "<group>"; };
@@ -80,8 +77,6 @@
 				FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */,
 				FB03B64D1EAEA81700954A00 /* BMData.h */,
 				FB03B64E1EAEA81700954A00 /* BMData.m */,
-				FB03B6471EAE8C5600954A00 /* Peripheral.h */,
-				FB03B6481EAE8C5600954A00 /* Peripheral.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
 				FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */,
 				FB3B59ED1EAE5EAC00DFE11A /* Supporting Files */,
@@ -183,7 +178,6 @@
 				FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */,
 				FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */,
 				FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */,
-				FB03B6491EAE8C5600954A00 /* Peripheral.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

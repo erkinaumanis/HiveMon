@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
+#import "BMData.h"
 
-#import "Peripheral.h"
 
 @protocol BlueDelegate <NSObject>
 
-- (void) discoveredBM: (Peripheral *)reportedP;
+- (void) newData: (BMData *)data;
 
 @end
 

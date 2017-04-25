@@ -58,13 +58,14 @@
     
 }
 
-- (void) discoveredBM: (Peripheral *)reportedP {
-    NSString *internalName = [reportedP internalName];
+- (void) newData: (BMData *)data {
+    NSString *internalName = [data internalName];
+    
     if ([discoveredPeripherals objectForKey:internalName]) {
         NSLog(@"Duplicate, ignoring: %@", internalName);
         return;
     }
-    [discoveredPeripherals addObject:reportedP withKey:internalName];
+    [discoveredPeripherals addObject:data withKey:internalName];
     [self.tableView reloadData];
 }
 
@@ -125,16 +126,16 @@
                 return cell;
 #endif
 
-    Peripheral *p = [discoveredPeripherals
+    BMData *d = [discoveredPeripherals
                      objectAtIndex:indexPath.row];
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%20@  %3@ %3.0f%%  %3d°  %2d%%  %@",
+    cell.textLabel.text = [NSString stringWithFormat:@"%20@  %3@ %3.0d%%  %3d°  %2d%%  %@",
                            [discoveredPeripherals keyAtIndex:indexPath.row],
-                           p.rssi,
-                           [p battery],
-                           [p temperature],
-                           [p humidity],
-                           [p isScale] ? @"Scale" : @"Sensor"];
+                           d.rssi,
+                           d.battery,
+                           d.temperature,
+                           d.humidity,
+                           [d isScale] ? @"Scale" : @"Sensor"];
     cell.textLabel.textAlignment = NSTextAlignmentLeft;
     
     cell.accessoryView = nil;
