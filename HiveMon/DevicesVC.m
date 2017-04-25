@@ -60,6 +60,7 @@
     self.title = @"Devices";
     
     blueToothMGR.delegate = self;
+    [locationMGR initLocationServices];
     [locationMGR awaitLocationData:self];
 }
 

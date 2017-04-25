@@ -95,6 +95,7 @@ LocationMGR *locationMGR;
 
 - (void)locationManager:(CLLocationManager *)manager
 didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    NSLog(@"... %s", __PRETTY_FUNCTION__);
     switch (status) {
         case kCLAuthorizationStatusAuthorizedAlways:
         case kCLAuthorizationStatusAuthorizedWhenInUse:
