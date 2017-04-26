@@ -26,5 +26,7 @@
 
 - (void) initLocationServices;
 - (void) awaitLocationData: (id<AwaitLocationData>)delegate;
+- (void) startUpdatingLocation;
+- (void) stopUpdatingLocation;
 
 @end

@@ -10,6 +10,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "Observation.h"
+#import "Device.h"
 
 typedef enum BMdevice_t {
     BMScale,
@@ -22,6 +23,7 @@ typedef enum BMdevice_t {
     NSDate *timeStamp;
     NSNumber *rssi;
     BMdevice_t type;
+    NSString *internalName;
     int battery;
     int samples;
     int temperature;
@@ -34,6 +36,7 @@ typedef enum BMdevice_t {
 @property (strong, nonatomic)   NSDate *timeStamp;
 @property (strong, nonatomic)   NSNumber *rssi;
 @property (assign)              BMdevice_t type;
+@property (nonatomic, strong)   NSString *internalName;
 @property (assign)              int battery;
 @property (assign)              int samples;
 @property (assign)              int temperature;
@@ -43,8 +46,7 @@ typedef enum BMdevice_t {
 
 - (id)initFrom: (NSDictionary <NSString *,id> *)advertisementData
         inPeripheral:(CBPeripheral *) p;
-- (NSString *) internalName;
-- (BOOL) isScale;
 - (Observation *) makeObservation;
+- (Device *) makeNewDevice;
 
 @end

@@ -19,6 +19,7 @@
 @property (strong, nonatomic)   LocationMGR *locationMGR;
 @property (strong, nonatomic)   CLLocation *currentLocation;
 @property (strong, nonatomic)   Apiary *currentApiary;
+@property (strong, nonatomic)   NSTimer *timer;
 
 @end
 
@@ -30,6 +31,7 @@
 @synthesize currentApiary;
 @synthesize apiaries;
 @synthesize devices;
+@synthesize timer;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -124,7 +126,8 @@
 - (void) startApiaryScan {
     if ([self findCurrentApiary]) {
         NSLog(@"found current apiary: %@", currentApiary.name);
-        [blueToothMGR startScan];
+        self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
+        [self startBlueToothScan];
     } else {    // Name the apiary, then start bluetooth scan
         UIAlertController * alertController = [UIAlertController
                                                alertControllerWithTitle: @"Local apiary name"
@@ -160,10 +163,39 @@
                                             [apiaries addObject:currentApiary];
                                             [self updateApiaries];
                                         }
-                                        [blueToothMGR startScan];   // <--- important control code
+                                        self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
+                                        [self startBlueToothScan];
                                     }]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
+}
+
+#define SCAN_DURATION   20 // 45                      // seconds.  It gets most in about 10
+#define SCAN_FREQUENCY  30 //(100-SCAN_DURATION)    // seconds
+
+- (void) startBlueToothScan {
+    timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
+                                     target:self
+                                           selector:@selector(finishScan:)
+                                   userInfo:nil
+                                    repeats:NO];
+    [blueToothMGR startScan];   // <--- important control code
+}
+
+- (void) finishScan:(NSTimer *)t {
+    NSLog(@"Shut down for a while");
+    [locationMGR stopUpdatingLocation];
+    [blueToothMGR stopScan];
+    timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
+                                             target:self
+                                           selector:@selector(timerStartScan:)
+                                           userInfo:nil
+                                            repeats:YES];
+}
+
+- (void) timerStartScan:(NSTimer *)t {
+    NSLog(@"Time's up, scan again");
+    [self startBlueToothScan];
 }
 
 // find the closest apiary to our current location.  If it isn't close enough,
@@ -179,7 +211,7 @@
         Apiary *a = apiaries[i];
         
         CLLocationDistance distance = [currentLocation distanceFromLocation:a.location];
-        NSLog(@"  distance = %.2f", distance);
+        NSLog(@"  distance to %@: %.2f", a.name, distance);
         if (distance < minDistance) {
             minDistance = distance;
             currentApiary = a;
@@ -213,17 +245,16 @@
 // We have fresh data about a device
 
 - (void) newData: (BMData *)data {
-    NSString *internalName = [data internalName];
+    NSString *internalName = data.internalName;
     Device *device = [devices objectForKey:internalName];
     if (!device) {   // create new device
-        NSLog(@"Creating device: %@", internalName);
-        device = [[Device alloc] init];
-        device.isScale = [data isScale];
+        NSLog(@"Creating device: %@", data.internalName);
+        device = [data makeNewDevice];
         [devices addObject:device withKey:internalName];
-        [self updateDevices];
     } else
         NSLog(@"Updating device: %@", internalName);
     device.lastObservation = [data makeObservation];
+    [self updateDevices];
     [self.tableView reloadData];
 }
 

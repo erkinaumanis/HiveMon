@@ -7,6 +7,7 @@
 //
 
 #import "BMData.h"
+
 // From the supplied doc:
 
 // broodminder stuff is at 14:
@@ -114,7 +115,6 @@ bm_w(uint8_t *b) {
 
 @interface BMData ()
 
-@property (nonatomic, strong)   NSString *internalName;
 @property (nonatomic, strong)   NSDictionary <NSString *,id> *rawAdData;
 
 @end
@@ -179,6 +179,10 @@ bm_w(uint8_t *b) {
                 return nil;
         }
         internalName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
+        if (!internalName) {
+            NSLog(@"XXX internal name missing for peripheral %@", peripheral.name);
+            return nil;
+        }
         
         peripheral = p;
         rssi = 0;
@@ -187,17 +191,16 @@ bm_w(uint8_t *b) {
     return self;
 }
 
-- (NSString *) internalName {
-    NSString *name = internalName;
-    if (!internalName) {
-        name = [NSString stringWithFormat:@"(%@)", peripheral.name];
-        NSLog(@"XXX internal name missing, using %@", internalName);
-    }
-    return name;
-}
-
 - (BOOL) isScale {
     return type == BMScale;
+}
+
+- (Device *) makeNewDevice {
+    Device *device = [[Device alloc] init];
+    device.isScale = [self isScale];
+    device.name = internalName;
+    device.lastReport = [NSDate distantPast];
+    return device;
 }
 
 - (Observation *) makeObservation {

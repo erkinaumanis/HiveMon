@@ -99,20 +99,6 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
             break;
         case kCLAuthorizationStatusDenied: {
             locationDenied = YES;
-#ifdef OLD
-            
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Fanify cannot run without location information"
-                                                                           message:@"Authorization denied by user"
-                                                                    preferredStyle:UIAlertControllerStyleAlert];
-            
-            UIAlertAction* defaultAction = [UIAlertAction
-                                            actionWithTitle:@"Change permissions and restart app"
-                                            style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction * action) {}
-                                            ];
-            [alert addAction:defaultAction];
-            [self presentViewController:alert animated:YES completion:nil];
-#endif
             break;
         }
         default:
@@ -120,8 +106,16 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     }
 }
 
+- (void) startUpdatingLocation {
+    [systemLocationMgr startUpdatingLocation];
+}
+
+- (void) stopUpdatingLocation {
+    [systemLocationMgr stopUpdatingLocation];
+}
+
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    NSLog(@"location didFailWithError");
+    NSLog(@"%s didFailWithError", __PRETTY_FUNCTION__);
     switch (error.code) {
         case kCLErrorLocationUnknown:
             if (awaitingLocation) {
@@ -145,7 +139,6 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
-    NSLog(@"location didUpdateHeading");
     if (newHeading.headingAccuracy < 0)
         return;
     
