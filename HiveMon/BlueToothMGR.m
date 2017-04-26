@@ -76,10 +76,6 @@
     if (!data)
         return;
     data.rssi = RSSI;
-
-//    NSUUID *appleID = peripheral.identifier;
-//    NSLog(@"%@  %3@  %@", appleID, RSSI, name);
-//    NSLog(@"   ad: %@", advertisementData);
     [delegate newData:data];
 }
 

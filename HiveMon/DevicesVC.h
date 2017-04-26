@@ -7,16 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "OrderedDictionary.h"
 #import "BlueToothMGR.h"
 #import "LocationMGR.h"
 
 @interface DevicesVC : UITableViewController
-    <UITableViewDelegate, UITableViewDataSource, BlueDelegate,
+    <UITableViewDelegate,
+    UITableViewDataSource,
+    BlueDelegate,
     AwaitLocationData> {
-    BlueToothMGR *blueToothMGR;
+        NSMutableArray *apiaries;
+        OrderedDictionary *devices;
 }
 
-@property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
+@property (strong, nonatomic)   NSMutableArray *apiaries;
+@property (strong, nonatomic)   OrderedDictionary *devices;
+
+- (void) startPoll;
 
 @end
 

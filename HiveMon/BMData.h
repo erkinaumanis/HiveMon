@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 
+#import "Observation.h"
+
 typedef enum BMdevice_t {
     BMScale,
     BMSensor,
@@ -24,8 +26,8 @@ typedef enum BMdevice_t {
     int samples;
     int temperature;
     int humidity;
-    int leftWeight;     // Scales...
-    int rightWeight;    // ... only
+    double leftWeight;     // Scales...
+    double rightWeight;    // ... only
 }
 
 @property (strong, nonatomic)   CBPeripheral *peripheral;
@@ -36,12 +38,13 @@ typedef enum BMdevice_t {
 @property (assign)              int samples;
 @property (assign)              int temperature;
 @property (assign)              int humidity;
-@property (assign)              int leftWeight;
-@property (assign)              int rightWeight;
+@property (assign)              double leftWeight;
+@property (assign)              double rightWeight;
 
 - (id)initFrom: (NSDictionary <NSString *,id> *)advertisementData
         inPeripheral:(CBPeripheral *) p;
 - (NSString *) internalName;
 - (BOOL) isScale;
+- (Observation *) makeObservation;
 
 @end

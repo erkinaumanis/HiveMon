@@ -27,6 +27,4 @@
 - (void) initLocationServices;
 - (void) awaitLocationData: (id<AwaitLocationData>)delegate;
 
-extern LocationMGR *locationMGR;
-
 @end

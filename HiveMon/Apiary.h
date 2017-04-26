@@ -11,6 +11,8 @@
 
 #import "Hive.h"
 
+#define DEFAULT_APIARY_NAME @"(default)"
+
 @interface Apiary : NSObject {
     NSString *name;
     CLLocation *location;
@@ -20,5 +22,7 @@
 @property (nonatomic, strong)   NSString *name;
 @property (nonatomic, strong)   NSMutableArray *hives;
 @property (nonatomic, retain)   CLLocation *location;
+
+- (void) makeDefaultApiary;
 
 @end

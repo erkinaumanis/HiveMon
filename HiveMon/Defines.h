@@ -13,6 +13,7 @@
 #define kBlueToothRestoreKey    @"BlueToothRestoreKey"
 
 #define APIARIES_ARCHIVE        @"Apiaries"
+#define DEVICES_ARCHIVE         @"Devices"
 
 #define USED(x) ((void)(x))
 

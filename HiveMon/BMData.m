@@ -92,8 +92,8 @@ typedef struct bm_adv_resp {
 
 // values for bm_model:
 
-#define BM_SENSOR       42
-#define BM_SCALE        43
+#define BM_SENSOR_MODEL       42
+#define BM_SCALE_MODEL        43
 
 // magic to convert temperature field to degress F
 
@@ -141,34 +141,42 @@ bm_w(uint8_t *b) {
                            objectForKey:CBAdvertisementDataManufacturerDataKey];
         if (!manData || manData.length < sizeof(bm_adv_resp))
             return nil;
+        
         bm_adv_resp *bm_adv = (bm_adv_resp *)manData.bytes;
         if (bm_adv->bm_man0 != 0x8d || bm_adv->bm_man1 != 0x02)
             return nil; // wrong manufacturer
-        switch (bm_adv->bm_devmajor) {
-            case 1:
-                temperature = USHORT(bm_adv->v1.bm_temp);
-                humidity = 0;
-                battery = bm_adv->v1.bm_battery;
-                break;
-            case 2:
-                temperature =  bm_f(USHORT(bm_adv->v2.bm_temp));
-                humidity = bm_adv->v2.bm_humidity;
-                battery = bm_adv->v2.bm_battery;
-                break;
-            default:
-                NSLog(@"Unknown major version number: %d", bm_adv->bm_devmajor);
-                return nil;
-        }
+        
         switch (bm_adv->bm_model) {
-            case BM_SCALE:
+            case BM_SCALE_MODEL:
                 type = BMScale;
                 break;
-            case BM_SENSOR:
+            case BM_SENSOR_MODEL:
                 type = BMSensor;
                 break;
             default:
                 NSLog(@"Unknown BroodMaster type: %d", bm_adv->bm_model);
                 type = BMSensor;
+        }
+        switch (bm_adv->bm_devmajor) {
+            case 1:
+                temperature = USHORT(bm_adv->v1.bm_temp);
+                humidity = 0;
+                battery = bm_adv->v1.bm_battery;
+                samples = USHORT(bm_adv->v1.bm_samples);
+                break;
+            case 2:
+                temperature =  bm_f(USHORT(bm_adv->v2.bm_temp));
+                humidity = bm_adv->v2.bm_humidity;
+                battery = bm_adv->v2.bm_battery;
+                samples = USHORT(bm_adv->v2.bm_samples);
+                if ([self isScale]) {
+                    rightWeight = bm_w((uint8_t *)&bm_adv->v2.bm_weight_right);
+                    leftWeight = bm_w((uint8_t *)&bm_adv->v2.bm_weight_left);
+                }
+                break;
+            default:
+                NSLog(@"Unknown major version number: %d", bm_adv->bm_devmajor);
+                return nil;
         }
         internalName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
         
@@ -189,7 +197,18 @@ bm_w(uint8_t *b) {
 }
 
 - (BOOL) isScale {
-    return type == BMSensor;
+    return type == BMScale;
+}
+
+- (Observation *) makeObservation {
+    Observation *observation = [[Observation alloc] init];
+    observation.rssi = rssi;
+    observation.battery = battery;
+    observation.samples = samples;
+    observation.temperature = temperature;
+    observation.humidity = humidity;
+    observation.weight = leftWeight + rightWeight;
+    return observation;
 }
 
 @end

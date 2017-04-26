@@ -8,15 +8,11 @@
 
 #import "AppDelegate.h"
 #import "DevicesVC.h"
-#import "BlueToothMGR.h"
-#import "LocationMGR.h"
 
 
 @interface AppDelegate ()
 
 @property (strong, nonatomic)   DevicesVC *devicesVC;
-@property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
-@property (nonatomic, strong)   LocationMGR *locationMGR;
 
 @end
 
@@ -28,8 +24,6 @@
 @synthesize persistentStoreCoordinator;
 @synthesize navController;
 @synthesize devicesVC;
-@synthesize blueToothMGR;
-@synthesize locationMGR;
 
 - (BOOL)application:(UIApplication *)application
 didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -38,15 +32,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     if (![[NSFileManager defaultManager] changeCurrentDirectoryPath: documentsDirectory])
         NSLog(@"AppDelegate: could not cd to documents directory ***");
     
-    self.locationMGR = [[LocationMGR alloc] init];  // accessed by app through global variable
-
     self.window = [[UIWindow alloc]
                    initWithFrame:[[UIScreen mainScreen]
                                   bounds]];
-    self.blueToothMGR = [[BlueToothMGR alloc] init];
     devicesVC = [[DevicesVC alloc]
                    initWithStyle:UITableViewStyleGrouped];
-    devicesVC.blueToothMGR = self.blueToothMGR;
     self.navController = [[UINavigationController alloc]
                           initWithRootViewController: devicesVC];
     self.window.rootViewController = navController;

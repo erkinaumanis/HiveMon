@@ -20,6 +20,7 @@
 		FB3B59FD1EAE5EAC00DFE11A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB3B59FC1EAE5EAC00DFE11A /* Assets.xcassets */; };
 		FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */; };
 		FB3B5A0D1EAE71E800DFE11A /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */; };
+		FBA7A5A71EB0DBE900E78BDD /* Observation.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A61EB0DBE900E78BDD /* Observation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,8 @@
 		FB3B5A081EAE706500DFE11A /* BlueToothMGR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlueToothMGR.h; sourceTree = "<group>"; };
 		FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlueToothMGR.m; sourceTree = "<group>"; };
 		FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		FBA7A5A51EB0DBE900E78BDD /* Observation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observation.h; sourceTree = "<group>"; };
+		FBA7A5A61EB0DBE900E78BDD /* Observation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Observation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +101,8 @@
 				FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */,
 				FB03B65B1EAF80F600954A00 /* LocationMGR.h */,
 				FB03B65C1EAF80F600954A00 /* LocationMGR.m */,
+				FBA7A5A51EB0DBE900E78BDD /* Observation.h */,
+				FBA7A5A61EB0DBE900E78BDD /* Observation.m */,
 				FB03B64D1EAEA81700954A00 /* BMData.h */,
 				FB03B64E1EAEA81700954A00 /* BMData.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
@@ -199,6 +204,7 @@
 				FB03B64F1EAEA81700954A00 /* BMData.m in Sources */,
 				FB3B59F21EAE5EAC00DFE11A /* AppDelegate.m in Sources */,
 				FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */,
+				FBA7A5A71EB0DBE900E78BDD /* Observation.m in Sources */,
 				FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */,
 				FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */,
 				FB03B65D1EAF80F600954A00 /* LocationMGR.m in Sources */,

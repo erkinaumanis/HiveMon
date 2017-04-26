@@ -8,8 +8,6 @@
 
 #import "LocationMGR.h"
 
-LocationMGR *locationMGR;
-
 @interface LocationMGR ()
 
 @property (nonatomic, strong)   CLLocationManager *systemLocationMgr;
@@ -28,7 +26,6 @@ LocationMGR *locationMGR;
 - (id)init {
     self = [super init];
     if (self) {
-        locationMGR = self;
         self.location = nil;    // no location data available
         self.locationDenied = NO;
         self.systemLocationMgr = nil;
@@ -36,7 +33,6 @@ LocationMGR *locationMGR;
    }
     return self;
 }
-
 
 // XXXX need location status denied, pending
 
@@ -95,7 +91,7 @@ LocationMGR *locationMGR;
 
 - (void)locationManager:(CLLocationManager *)manager
 didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    NSLog(@"... %s", __PRETTY_FUNCTION__);
+//    NSLog(@"... %s", __PRETTY_FUNCTION__);
     switch (status) {
         case kCLAuthorizationStatusAuthorizedAlways:
         case kCLAuthorizationStatusAuthorizedWhenInUse:

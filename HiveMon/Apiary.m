@@ -28,6 +28,15 @@
     return self;
 }
 
+#define NORTH_POLE_LAT  90.0
+#define NORTH_POLE_LONG -74.400985    // MH, NJ, because it is fun
+
+- (void) makeDefaultApiary {
+    name = DEFAULT_APIARY_NAME;
+    location = [[CLLocation alloc]
+                initWithLatitude:NORTH_POLE_LAT longitude: NORTH_POLE_LONG];
+}
+
 - (id) initWithCoder: (NSCoder *)coder {
     self = [super init];
     if (self) {
