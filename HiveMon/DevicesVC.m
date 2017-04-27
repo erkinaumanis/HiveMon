@@ -23,6 +23,10 @@
 @property (strong, nonatomic)   NSTimer *timer;
 @property (strong, nonatomic)   NSFileHandle *observationLogHandle;
 
+@property (strong, nonatomic)   UIView *statusView;
+@property (strong, nonatomic)   UILabel *statusLabel;
+@property (strong, nonatomic)   UIActivityIndicatorView *activityView;
+
 @end
 
 @implementation DevicesVC
@@ -35,6 +39,7 @@
 @synthesize devices;
 @synthesize timer;
 @synthesize observationLogHandle;
+@synthesize statusView, statusLabel, activityView;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -94,16 +99,59 @@
         NSLog(@"apiary update failed");
 }
 
+#define STATUS_VIEW_W    110
+#define STATUS_WIDTH    70
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.title = @"Devices";
     
+    CGRect f = self.navigationController.navigationBar.frame;
+    f.size.width = STATUS_VIEW_W;
+    statusView = [[UIView alloc] initWithFrame:f];
+    
+    activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    activityView.frame = CGRectMake(-20, 0,
+                                    f.size.height,  // square field
+                                    f.size.height);
+    activityView.hidesWhenStopped = YES;
+    activityView.backgroundColor = [UIColor clearColor];
+    [statusView addSubview:activityView];
+    
+    statusLabel = [[UILabel alloc] initWithFrame:
+                   CGRectMake(activityView.frame.origin.x + activityView.frame.size.width - 5, 10,
+                              statusView.frame.size.width - activityView.frame.size.width,
+                              f.size.height-10)];
+    statusLabel.text = @"";
+    statusLabel.font = [UIFont systemFontOfSize:12];
+    [statusView addSubview:statusLabel];
+   
+    UIBarButtonItem *statusBarItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
+    self.navigationItem.leftBarButtonItem = statusBarItem;
+
     blueToothMGR.delegate = self;
     [self startPoll];
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self.navigationController.navigationBar setOpaque:YES];
+    [self.navigationController.navigationBar setTranslucent:NO];
+    self.navigationController.toolbar.backgroundColor = [UIColor lightGrayColor];
+    self.navigationController.toolbar.opaque = YES;
+    self.navigationController.toolbar.translucent = NO;
+    self.navigationController.toolbarHidden = NO;
+    
+    //    SET_VIEW_WIDTH(iCloudHeaderView, self.view.frame.size.width);
+    //    SET_VIEW_WIDTH(localHeaderView, self.view.frame.size.width);
+}
+
 - (void) startPoll {
+    [activityView startAnimating];
+    statusLabel.text = @"scanning";
+    [statusLabel setNeedsDisplay];
     [locationMGR initLocationServices];
     [locationMGR awaitLocationData:self];
 }
@@ -175,8 +223,8 @@
     }
 }
 
-#define SCAN_DURATION   20 // 45                      // seconds.  It gets most in about 10
-#define SCAN_FREQUENCY  30 //(100-SCAN_DURATION)    // seconds
+#define SCAN_DURATION   30 // 45                      // seconds.  It gets most in about 10
+#define SCAN_FREQUENCY  120 //(100-SCAN_DURATION)    // seconds
 
 - (void) startBlueToothScan {
     timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
@@ -190,6 +238,10 @@
 - (void) finishScan:(NSTimer *)t {
     if (DEBUG)
         NSLog(@"Shut down for %ds.", SCAN_FREQUENCY);
+    statusLabel.text = @"";
+    [statusLabel setNeedsDisplay];
+    [activityView stopAnimating];
+    
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
     [observationLogHandle closeFile];
@@ -230,20 +282,6 @@
         return minDistance <= APIARY_CLOSE_ENOUGH;
     } else
         return NO;
-}
-
-- (void) viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [self.navigationController.navigationBar setOpaque:YES];
-    [self.navigationController.navigationBar setTranslucent:NO];
-    self.navigationController.toolbar.backgroundColor = [UIColor lightGrayColor];
-    self.navigationController.toolbar.opaque = YES;
-    self.navigationController.toolbar.translucent = NO;
-    self.navigationController.toolbarHidden = NO;
-    
-//    SET_VIEW_WIDTH(iCloudHeaderView, self.view.frame.size.width);
-//    SET_VIEW_WIDTH(localHeaderView, self.view.frame.size.width);
 }
 
 - (void) viewDidAppear:(BOOL)animated {
