@@ -12,12 +12,14 @@
 #define kDisplayLabel   @"DisplayLabel"
 #define kLastReport @"LastReport"
 #define kHiveName   @"HiveName"
+#define kApiaryName @"ApiaryName"
 #define kIsScale    @"IsScale"
 
 @implementation Device
 
 @synthesize name;
 @synthesize hiveName;
+@synthesize apiaryName;
 @synthesize lastReport;
 @synthesize displayLabel;
 @synthesize lastObservation;
@@ -28,6 +30,7 @@
     self = [super init];
     if (self) {
         hiveName = @"";
+        apiaryName = @"";
         name = @"";
         displayLabel = @"";
         lastObservation = nil;
@@ -42,6 +45,7 @@
         displayLabel = [coder decodeObjectForKey: kDisplayLabel];
         lastReport = [coder decodeObjectForKey: kLastReport];
         hiveName = [coder decodeObjectForKey: kHiveName];
+        apiaryName = [coder decodeObjectForKey: kApiaryName];
         isScale = [coder decodeBoolForKey:kIsScale];
         lastObservation = nil;
     }
@@ -53,6 +57,7 @@
     [coder encodeObject:displayLabel forKey:kDisplayLabel];
     [coder encodeObject:lastReport forKey:kLastReport];
     [coder encodeObject:hiveName forKey:kHiveName];
+    [coder encodeObject:apiaryName forKey:kApiaryName];
     [coder encodeBool:isScale forKey:kIsScale];
 }
 

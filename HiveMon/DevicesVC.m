@@ -253,6 +253,8 @@
         [devices addObject:device withKey:internalName];
     } else
         NSLog(@"Updating device: %@", internalName);
+    
+    device.apiaryName = currentApiary.name;
     device.lastObservation = [data makeObservation];
     [self updateDevices];
     [self.tableView reloadData];

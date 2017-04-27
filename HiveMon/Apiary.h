@@ -10,16 +10,20 @@
 #import <CoreLocation/CoreLocation.h>
 
 #import "Hive.h"
+#import "Device.h"
+#import "OrderedDictionary.h"
 
 #define DEFAULT_APIARY_NAME @"(default)"
 
 @interface Apiary : NSObject {
     NSString *name;
     CLLocation *location;
-    NSMutableArray *hives;  // array of hives
+    NSMutableArray *hives;
+    OrderedDictionary *devices;
 }
 
 @property (nonatomic, strong)   NSString *name;
+@property (nonatomic, strong)   OrderedDictionary *devices;
 @property (nonatomic, strong)   NSMutableArray *hives;
 @property (nonatomic, retain)   CLLocation *location;
 

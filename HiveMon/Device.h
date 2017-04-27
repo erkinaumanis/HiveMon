@@ -17,6 +17,7 @@
     NSString *displayLabel; // not used for lookups
     BOOL isScale;
     NSString *hiveName;
+    NSString *apiaryName;
     Observation *lastObservation;
 }
 
@@ -25,6 +26,7 @@
 @property (nonatomic, strong)   NSString *displayLabel;
 @property (assign)              BOOL isScale;
 @property (nonatomic, strong)   NSString *hiveName;
+@property (nonatomic, strong)   NSString *apiaryName;
 @property (nonatomic, strong)   Observation *lastObservation;
 
 @end

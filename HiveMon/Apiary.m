@@ -10,6 +10,7 @@
 
 #define kName           @"Name"
 #define kLocation       @"Location"
+#define kDevices        @"Devices"
 #define kHives          @"Hives"
 
 @implementation Apiary
@@ -17,12 +18,14 @@
 @synthesize name;
 @synthesize location;
 @synthesize hives;
+@synthesize devices;
 
 
 - (id)init {
     self = [super init];
     if (self) {
         hives = [[NSMutableArray alloc] init];
+        devices = [[OrderedDictionary alloc] init];
         name = @"";
     }
     return self;
@@ -43,6 +46,9 @@
         name = [coder decodeObjectForKey: kName];
         location = [coder decodeObjectForKey: kLocation];
         hives = [coder decodeObjectForKey: kHives];
+        devices = [coder decodeObjectForKey: kDevices];
+        if (!devices)
+            devices = [[OrderedDictionary alloc] init]; // for older data
     }
     return self;
 }
@@ -51,6 +57,9 @@
     [coder encodeObject:name forKey:kName];
     [coder encodeObject:location forKey:kLocation];
     [coder encodeObject:hives forKey:kHives];
+    if (!devices)
+        devices = [[OrderedDictionary alloc] init]; // for older data
+    [coder encodeObject:devices forKey:kDevices];
 }
 
 @end
