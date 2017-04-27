@@ -14,6 +14,7 @@
 
 #define APIARIES_ARCHIVE        @"Apiaries"
 #define DEVICES_ARCHIVE         @"Devices"
+#define OBSERVATIONS_LOG         @"Observations.log"
 
 #define USED(x) ((void)(x))
 

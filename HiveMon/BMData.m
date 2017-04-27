@@ -205,6 +205,7 @@ bm_w(uint8_t *b) {
 
 - (Observation *) makeObservation {
     Observation *observation = [[Observation alloc] init];
+    observation.timeStamp = timeStamp;
     observation.rssi = rssi;
     observation.battery = battery;
     observation.samples = samples;

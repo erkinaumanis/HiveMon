@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface Observation : NSObject {
+    NSDate *timeStamp;
     NSNumber *rssi;
     int battery;
     int samples;
@@ -17,11 +18,14 @@
     double weight;     // Scales  only
 }
 
+@property (strong, nonatomic)   NSDate *timeStamp;
 @property (strong, nonatomic)   NSNumber *rssi;
 @property (assign)              int battery;
 @property (assign)              int samples;
 @property (assign)              int temperature;
 @property (assign)              int humidity;
 @property (assign)              double weight;
+
+- (NSString *) formatForLogging: (NSString *)deviceName;
 
 @end

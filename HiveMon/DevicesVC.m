@@ -12,6 +12,7 @@
 #import "OrderedDictionary.h"
 #import "Apiary.h"
 
+// #define CLEAR_FILES  //debug, clear everything
 
 @interface DevicesVC ()
 
@@ -20,6 +21,7 @@
 @property (strong, nonatomic)   CLLocation *currentLocation;
 @property (strong, nonatomic)   Apiary *currentApiary;
 @property (strong, nonatomic)   NSTimer *timer;
+@property (strong, nonatomic)   NSFileHandle *observationLogHandle;
 
 @end
 
@@ -32,16 +34,17 @@
 @synthesize apiaries;
 @synthesize devices;
 @synthesize timer;
+@synthesize observationLogHandle;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
         currentLocation = nil;
         
-        // XXXX debug:
-//        [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
-//        [[NSFileManager defaultManager] removeItemAtPath:DEVICES_ARCHIVE error:nil];
-
+#ifdef CLEAR_FILES
+        [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:DEVICES_ARCHIVE error:nil];
+#endif
         // fetch apiary data
         currentApiary = nil;
         NSData *apiariesData = [NSKeyedUnarchiver unarchiveObjectWithFile:APIARIES_ARCHIVE];
@@ -65,6 +68,8 @@
             devices = [[OrderedDictionary alloc] init];
             [self updateDevices];
         }
+        
+        observationLogHandle = nil;
         
         // Start services
         blueToothMGR = [[BlueToothMGR alloc] init];
@@ -183,14 +188,18 @@
 }
 
 - (void) finishScan:(NSTimer *)t {
-    NSLog(@"Shut down for a while");
+    if (DEBUG)
+        NSLog(@"Shut down for %ds.", SCAN_FREQUENCY);
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
+    [observationLogHandle closeFile];
+    observationLogHandle = nil;
+    
     timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                              target:self
                                            selector:@selector(timerStartScan:)
                                            userInfo:nil
-                                            repeats:YES];
+                                            repeats:NO];
 }
 
 - (void) timerStartScan:(NSTimer *)t {
@@ -248,16 +257,42 @@
     NSString *internalName = data.internalName;
     Device *device = [devices objectForKey:internalName];
     if (!device) {   // create new device
-        NSLog(@"Creating device: %@", data.internalName);
         device = [data makeNewDevice];
+        device.name = data.internalName;
+        if (DEBUG)
+            NSLog(@"Creating device: %@", device.name);
         [devices addObject:device withKey:internalName];
-    } else
-        NSLog(@"Updating device: %@", internalName);
+    }
     
     device.apiaryName = currentApiary.name;
     device.lastObservation = [data makeObservation];
+    [self appendToObservationLog:device];
     [self updateDevices];
     [self.tableView reloadData];
+}
+
+- (void) appendToObservationLog: (Device *)device {
+    if (!observationLogHandle) {
+        NSFileManager *mgr = [NSFileManager defaultManager];
+        
+#ifdef CLEAR_FILES
+        [mgr removeItemAtPath:OBSERVATIONS_LOG error:nil];
+#endif
+        if(![mgr fileExistsAtPath:OBSERVATIONS_LOG]) {
+            if (DEBUG) NSLog(@"Creating observations log...");
+            [mgr createFileAtPath:OBSERVATIONS_LOG contents:nil attributes:nil];
+        }
+        if (!observationLogHandle) {
+            if (DEBUG) NSLog(@"Opening observations log");
+            observationLogHandle = [NSFileHandle fileHandleForWritingAtPath:OBSERVATIONS_LOG];
+        }
+    }
+    [observationLogHandle seekToEndOfFile];
+    
+    NSString *logEntry = [device.lastObservation formatForLogging: device.name];
+    if (DEBUG)
+        NSLog(@"logging: %@", logEntry);
+    [observationLogHandle writeData:[logEntry dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (void)didReceiveMemoryWarning {

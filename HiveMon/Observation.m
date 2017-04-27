@@ -8,6 +8,7 @@
 
 #import "Observation.h"
 
+#define kTimeStamp  @"TimeStamp"
 #define kRSSI       @"RSSI"
 #define kBattery    @"Battery"
 #define kSamples    @"Samples"
@@ -17,6 +18,7 @@
 
 @implementation Observation
 
+@synthesize timeStamp;
 @synthesize rssi;
 @synthesize battery;
 @synthesize samples;
@@ -36,6 +38,7 @@
 - (id) initWithCoder: (NSCoder *)coder {
     self = [super init];
     if (self) {
+        timeStamp = [coder decodeObjectForKey:kTimeStamp];
         rssi = [coder decodeObjectForKey: kRSSI];
         battery = [coder decodeIntForKey:kBattery];
         samples = [coder decodeIntForKey: kSamples];
@@ -47,12 +50,27 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:timeStamp forKey:kTimeStamp];
     [coder encodeObject:rssi forKey:kRSSI];
     [coder encodeInt:battery forKey:kBattery];
     [coder encodeInt:samples forKey:kSamples];
     [coder encodeInt:temperature forKey:kTemp];
     [coder encodeInt:humidity forKey:kHumidity];
     [coder encodeDouble:weight forKey:kWeight];
+}
+
+- (NSString *) formatForLogging: (NSString *)deviceName {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyyMMdd_HHmmss"];
+    [dateFormatter setLocale:[NSLocale currentLocale]];
+    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+    NSString *stamp = [dateFormatter stringFromDate:timeStamp];
+
+    NSString *logInfo = [NSString stringWithFormat:@"%@,%@,%d,%d,%d,%d",
+                         stamp, deviceName, battery, samples, temperature, humidity];
+    if (weight)    // not a scale
+        logInfo = [NSString stringWithFormat:@"%@,%.2f", logInfo,weight];
+    return logInfo;
 }
 
 @end
