@@ -57,6 +57,7 @@
             apiaries = [NSKeyedUnarchiver unarchiveObjectWithData:apiariesData];
         } else {
             apiaries = [[NSMutableArray alloc] init];
+            NSLog(@"current directory is %@", [[NSFileManager defaultManager]currentDirectoryPath]);
         }
         if ([apiaries count] == 0) {
             Apiary *da = [[Apiary alloc] init];
@@ -79,6 +80,8 @@
         // Start services
         blueToothMGR = [[BlueToothMGR alloc] init];
         locationMGR = [[LocationMGR alloc] init];
+        
+        SendMail *sendmail = [[SendMail alloc] init];
     }
     return self;
 }
@@ -133,6 +136,8 @@
     blueToothMGR.delegate = self;
     [self startPoll];
 }
+
+//908 534 1486 shell
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -192,6 +197,14 @@
             textField.clearButtonMode = UITextFieldViewModeWhileEditing;
             textField.borderStyle = UITextBorderStyleRoundedRect;
         }];
+        
+        UIPickerView *pickApiaryView = [[UIPickerView alloc] init];
+        pickApiaryView.dataSource = self;
+        pickApiaryView.delegate = self;
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.inputView = pickApiaryView;
+        }];
+
         [alertController addAction:[UIAlertAction
                                     actionWithTitle:@"OK"
                                     style:UIAlertActionStyleDefault
@@ -221,6 +234,29 @@
                                     }]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
+}
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+    return [apiaries count];
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView
+numberOfRowsInComponent:(NSInteger)component {
+    return 1;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView
+             titleForRow:(NSInteger)row
+            forComponent:(NSInteger)component {
+    Apiary *a = apiaries[component];
+    return a.name;
+}
+
+- (void)pickerView:(UIPickerView *)pickerView
+      didSelectRow:(NSInteger)row
+       inComponent:(NSInteger)component {
+    Apiary *a = apiaries[component];
+    NSLog(@"picked %@", a.name);
 }
 
 #define SCAN_DURATION   30 // 45                      // seconds.  It gets most in about 10

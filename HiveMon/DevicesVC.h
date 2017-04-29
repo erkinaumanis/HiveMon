@@ -10,12 +10,15 @@
 #import "OrderedDictionary.h"
 #import "BlueToothMGR.h"
 #import "LocationMGR.h"
+#import "SendMail.h"
 
 @interface DevicesVC : UITableViewController
     <UITableViewDelegate,
     UITableViewDataSource,
     BlueDelegate,
-    AwaitLocationData> {
+    AwaitLocationData,
+    UIPickerViewDelegate,
+    UIPickerViewDataSource> {
         NSMutableArray *apiaries;
         OrderedDictionary *devices;
 }
