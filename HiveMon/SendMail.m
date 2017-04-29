@@ -42,9 +42,9 @@
 - (id)init {
     self = [super init];
     if (self) {
-        u_char name[200];
-        int rc = gethostname(&name, sizeof(name));
-        NSLog(@"hostname = %s, %d", name, rc);
+        char hostName[200];
+        int rc = gethostname((char *)&hostName, sizeof(hostName));
+        NSLog(@"hostname = %s, %d", hostName, rc);
     }
     return self;
 }
