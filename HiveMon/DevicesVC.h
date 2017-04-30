@@ -10,7 +10,7 @@
 #import "OrderedDictionary.h"
 #import "BlueToothMGR.h"
 #import "LocationMGR.h"
-#import "SendMail.h"
+#import "Log.h"
 
 @interface DevicesVC : UITableViewController
     <UITableViewDelegate,

@@ -10,11 +10,14 @@
 #define Defines_h
 
 
+//#define CLEAR_FILES  //debug, clear everything
+
 #define kBlueToothRestoreKey    @"BlueToothRestoreKey"
 
 #define APIARIES_ARCHIVE        @"./Apiaries"
 #define DEVICES_ARCHIVE         @"./Devices"
 #define OBSERVATIONS_LOG        @"./Observations.log"
+#define BEEMON_LOG              @"./BeeMon.log"
 
 #define USED(x) ((void)(x))
 

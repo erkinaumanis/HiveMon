@@ -8,9 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum snmp_status {
+    SNMP_OK = 200,
+    SNMP_TMP_FAIL = 400,
+    SNMP_PERM_ERR = 500,
+} snmp_status;
+
 @protocol SendMailProto <NSObject>
 
-- (NSString *) mailCompleted;   // returns status or nil of ok
+- (NSString *) mailCompleted: (snmp_status)
+status message:(NSString *)message ;   // returns status or nil of ok
 
 @end
 @interface SendMail : NSObject

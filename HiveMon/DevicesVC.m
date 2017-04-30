@@ -12,8 +12,6 @@
 #import "OrderedDictionary.h"
 #import "Apiary.h"
 
-// #define CLEAR_FILES  //debug, clear everything
-
 @interface DevicesVC ()
 
 @property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
@@ -21,8 +19,7 @@
 @property (strong, nonatomic)   CLLocation *currentLocation;
 @property (strong, nonatomic)   Apiary *currentApiary;
 @property (strong, nonatomic)   NSTimer *timer;
-@property (strong, nonatomic)   NSFileHandle *observationLogHandle;
-
+@property (strong, nonatomic)   Log *log;
 @property (strong, nonatomic)   UIView *statusView;
 @property (strong, nonatomic)   UILabel *statusLabel;
 @property (strong, nonatomic)   UIActivityIndicatorView *activityView;
@@ -37,14 +34,15 @@
 @synthesize currentApiary;
 @synthesize apiaries;
 @synthesize devices;
+@synthesize log;
 @synthesize timer;
-@synthesize observationLogHandle;
 @synthesize statusView, statusLabel, activityView;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
         currentLocation = nil;
+        log = [[Log alloc] init];
         
 #ifdef CLEAR_FILES
         [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
@@ -75,13 +73,10 @@
             [self updateDevices];
         }
         
-        observationLogHandle = nil;
-        
         // Start services
         blueToothMGR = [[BlueToothMGR alloc] init];
         locationMGR = [[LocationMGR alloc] init];
         
-        SendMail *sendmail = [[SendMail alloc] init];
     }
     return self;
 }
@@ -263,6 +258,7 @@ numberOfRowsInComponent:(NSInteger)component {
 #define SCAN_FREQUENCY  120 //(100-SCAN_DURATION)    // seconds
 
 - (void) startBlueToothScan {
+    [log logIPhoneStatus];
     timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                      target:self
                                            selector:@selector(finishScan:)
@@ -280,8 +276,6 @@ numberOfRowsInComponent:(NSInteger)component {
     
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
-    [observationLogHandle closeFile];
-    observationLogHandle = nil;
     
     timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                              target:self
@@ -298,7 +292,7 @@ numberOfRowsInComponent:(NSInteger)component {
 // find the closest apiary to our current location.  If it isn't close enough,
 // set it to the best guess, and return NO.
 
-#define APIARY_CLOSE_ENOUGH     50  // meters
+#define APIARY_CLOSE_ENOUGH     15  // meters
 
 - (BOOL) findCurrentApiary {
     CLLocationDistance minDistance = DBL_MAX;
@@ -340,33 +334,10 @@ numberOfRowsInComponent:(NSInteger)component {
     
     device.apiaryName = currentApiary.name;
     device.lastObservation = [data makeObservation];
-    [self appendToObservationLog:device];
+    NSString *obsLogEntry = [device.lastObservation formatForLogging: device.name];
+    [log add:obsLogEntry];
     [self updateDevices];
     [self.tableView reloadData];
-}
-
-- (void) appendToObservationLog: (Device *)device {
-    if (!observationLogHandle) {
-        NSFileManager *mgr = [NSFileManager defaultManager];
-        
-#ifdef CLEAR_FILES
-        [mgr removeItemAtPath:OBSERVATIONS_LOG error:nil];
-#endif
-        if(![mgr fileExistsAtPath:OBSERVATIONS_LOG]) {
-            if (DEBUG) NSLog(@"Creating observations log...");
-            [mgr createFileAtPath:OBSERVATIONS_LOG contents:nil attributes:nil];
-        }
-        if (!observationLogHandle) {
-            if (DEBUG) NSLog(@"Opening observations log");
-            observationLogHandle = [NSFileHandle fileHandleForWritingAtPath:OBSERVATIONS_LOG];
-        }
-    }
-    [observationLogHandle seekToEndOfFile];
-    
-    NSString *logEntry = [device.lastObservation formatForLogging: device.name];
-    if (DEBUG)
-        NSLog(@"logging: %@", logEntry);
-    [observationLogHandle writeData:[logEntry dataUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (void)didReceiveMemoryWarning {

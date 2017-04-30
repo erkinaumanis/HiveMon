@@ -20,6 +20,7 @@
 		FB3B59FD1EAE5EAC00DFE11A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB3B59FC1EAE5EAC00DFE11A /* Assets.xcassets */; };
 		FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */; };
 		FB3B5A0D1EAE71E800DFE11A /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */; };
+		FB7394741EB6353200B8D289 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7394731EB6353200B8D289 /* Log.m */; };
 		FBA7A5A71EB0DBE900E78BDD /* Observation.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A61EB0DBE900E78BDD /* Observation.m */; };
 		FBA7A5AA1EB2296400E78BDD /* Export.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A91EB2296400E78BDD /* Export.m */; };
 		FBA7A5AD1EB236FB00E78BDD /* SendMail.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5AC1EB236FB00E78BDD /* SendMail.m */; };
@@ -51,6 +52,8 @@
 		FB3B5A081EAE706500DFE11A /* BlueToothMGR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlueToothMGR.h; sourceTree = "<group>"; };
 		FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlueToothMGR.m; sourceTree = "<group>"; };
 		FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		FB7394721EB6353200B8D289 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		FB7394731EB6353200B8D289 /* Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Log.m; sourceTree = "<group>"; };
 		FBA7A5A51EB0DBE900E78BDD /* Observation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observation.h; sourceTree = "<group>"; };
 		FBA7A5A61EB0DBE900E78BDD /* Observation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Observation.m; sourceTree = "<group>"; };
 		FBA7A5A81EB2296400E78BDD /* Export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Export.h; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 				FB03B64E1EAEA81700954A00 /* BMData.m */,
 				FBA7A5A81EB2296400E78BDD /* Export.h */,
 				FBA7A5A91EB2296400E78BDD /* Export.m */,
+				FB7394721EB6353200B8D289 /* Log.h */,
+				FB7394731EB6353200B8D289 /* Log.m */,
 				FBA7A5AB1EB236FB00E78BDD /* SendMail.h */,
 				FBA7A5AC1EB236FB00E78BDD /* SendMail.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
@@ -224,6 +229,7 @@
 				FBA7A5AA1EB2296400E78BDD /* Export.m in Sources */,
 				FB03B6581EAF786800954A00 /* Apiary.m in Sources */,
 				FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */,
+				FB7394741EB6353200B8D289 /* Log.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +277,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -314,7 +320,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -328,7 +334,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = HK64XTSZFA;
 				INFOPLIST_FILE = HiveMon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cheswick.HiveMon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -341,7 +347,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = HK64XTSZFA;
 				INFOPLIST_FILE = HiveMon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cheswick.HiveMon;
 				PRODUCT_NAME = "$(TARGET_NAME)";

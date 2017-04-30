@@ -180,7 +180,7 @@ bm_w(uint8_t *b) {
         }
         internalName = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
         if (!internalName) {
-            NSLog(@"XXX internal name missing for peripheral %@", peripheral.name);
+            // NSLog(@"XXX internal name missing for peripheral %@", peripheral.name);
             return nil;
         }
         
