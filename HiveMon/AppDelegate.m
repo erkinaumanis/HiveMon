@@ -48,42 +48,54 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 #ifdef DEBUG
-    NSLog(@"applicationWillResignActive");
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 #endif
     [devicesVC goingToBackground];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+#ifdef DEBUG
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+#endif
+#ifdef notdef
     UIBackgroundTaskIdentifier __block bgTask = [application
-                                         beginBackgroundTaskWithName:@"BeeMonTask"
-                                         expirationHandler:^{
-        // Clean up any unfinished task business by marking where you
-        // stopped or ending the task outright.
-        [application endBackgroundTask:bgTask];
-        bgTask = UIBackgroundTaskInvalid;
-    }];
+                                                 beginBackgroundTaskWithName:@"BeeMonTask"
+                                                 expirationHandler:^{
+                                                     // Clean up any unfinished task business by marking where you
+                                                     // stopped or ending the task outright.
+                                                     [application endBackgroundTask:bgTask];
+                                                     bgTask = UIBackgroundTaskInvalid;
+#ifdef DEBUG
+                                                     NSLog(@"%s FINISHED", __PRETTY_FUNCTION__);
+#endif
+                                                 }];
+#endif
     
     // Start the long-running task and return immediately.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSLog(@"%s dispatch", __PRETTY_FUNCTION__);
         [devicesVC doBackgroundIdleCycles];
+        NSLog(@"%s dispatch FINISHED", __PRETTY_FUNCTION__);
 
+#ifdef notdef
+        NSLog(@"%s dispatch", __PRETTY_FUNCTION__);
         [application endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
+#endif
     });
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 #ifdef DEBUG
-    NSLog(@"applicationWillEnterForeground");
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 #endif
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 #ifdef DEBUG
-    NSLog(@"applicationDidBecomeActive");
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 #endif
     [devicesVC leftBackground];
 }
@@ -92,7 +104,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Saves changes in the application's managed object context before the application terminates.
     [self saveContext];
 #ifdef DEBUG
-    NSLog(@"applicationWillTerminate");
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 #endif
 }
 

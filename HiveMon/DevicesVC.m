@@ -195,7 +195,7 @@
     if ([self findCurrentApiary]) {
         NSLog(@"found current apiary: %@", currentApiary.name);
         self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
-        [self startBlueToothScan:nil];
+        [self startBlueToothScan];
     } else {    // Name the apiary, then start bluetooth scan
         if (inBackground) {
             NSLog(@"XXXX apiary assignment in background, help");
@@ -243,7 +243,7 @@
                                                 [self updateApiaries];
                                             }
                                             self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
-                                            [self startBlueToothScan:nil];
+                                            [self startBlueToothScan];
                                         }]];
             [self presentViewController:alertController animated:YES completion:nil];
         }
@@ -274,8 +274,8 @@ numberOfRowsInComponent:(NSInteger)component {
 }
 
 
-#define SCAN_DURATION   30      // seconds
-#define IDLE_DURATION   120     // seconds.  Will be 3600
+#define SCAN_DURATION   20      // seconds
+#define IDLE_DURATION   60     // seconds.  Will be 3600
 
 - (void) goingToBackground {
     NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -296,13 +296,12 @@ numberOfRowsInComponent:(NSInteger)component {
     [NSThread detachNewThreadWithBlock:^{
         backgroundThread = [NSThread currentThread];
         while (TRUE) {
-            NSLog(@"Thread sleeping for %d", backFireInterval);
+            NSLog(@"Thread sleeping for %f", backFireInterval);
             [NSThread sleepForTimeInterval:backFireInterval];
             backFireInterval = IDLE_DURATION;
-            [self startBlueToothScan: nil];
+            [self startBlueToothScan];
         }
     }];
-    
 }
 
 - (void) leftBackground {
@@ -310,14 +309,14 @@ numberOfRowsInComponent:(NSInteger)component {
     inBackground = NO;
 }
 
-- (void) startBlueToothScan:(NSTimer *)t {
+- (void) startBlueToothScan {
     [log logIPhoneStatus];
     scanTimer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                      target:self
                                            selector:@selector(finishScan:)
                                    userInfo:nil
                                     repeats:NO];
-    [blueToothMGR startScan];   // <--- important control code
+    [blueToothMGR startScan];
 }
 
 - (void) finishScan:(NSTimer *)t {
@@ -326,17 +325,18 @@ numberOfRowsInComponent:(NSInteger)component {
     scanTimer = nil;
     
     statusLabel.text = @"";
-    if (!inBackground) {
-        [statusLabel setNeedsDisplay];
-        [activityView stopAnimating];
+    if (inBackground) {
+        return;
     }
     
+    [statusLabel setNeedsDisplay];
+    [activityView stopAnimating];
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
     
     idleTimer = [NSTimer scheduledTimerWithTimeInterval:IDLE_DURATION
                                              target:self
-                                           selector:@selector(startBlueToothScan:)
+                                           selector:@selector(startBlueToothScan)
                                            userInfo:nil
                                             repeats:NO];
 }
