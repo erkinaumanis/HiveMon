@@ -18,11 +18,16 @@
 @property (strong, nonatomic)   LocationMGR *locationMGR;
 @property (strong, nonatomic)   CLLocation *currentLocation;
 @property (strong, nonatomic)   Apiary *currentApiary;
-@property (strong, nonatomic)   NSTimer *timer;
+@property (strong, nonatomic)   NSTimer *scanTimer;
+@property (strong, nonatomic)   NSTimer *idleTimer;
 @property (strong, nonatomic)   Log *log;
 @property (strong, nonatomic)   UIView *statusView;
 @property (strong, nonatomic)   UILabel *statusLabel;
 @property (strong, nonatomic)   UIActivityIndicatorView *activityView;
+@property (assign)   BOOL inBackground;
+@property (nonatomic, strong)   NSThread *backgroundThread;
+@property (assign)   NSTimeInterval backFireInterval;
+
 
 @end
 
@@ -35,14 +40,19 @@
 @synthesize apiaries;
 @synthesize devices;
 @synthesize log;
-@synthesize timer;
+@synthesize scanTimer, idleTimer;
 @synthesize statusView, statusLabel, activityView;
+@synthesize inBackground, backgroundThread;
+@synthesize backFireInterval;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
         currentLocation = nil;
+        scanTimer = idleTimer = nil;
         log = [[Log alloc] init];
+        inBackground = NO;
+        backgroundThread = nil;
         
 #ifdef CLEAR_FILES
         [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
@@ -149,9 +159,11 @@
 }
 
 - (void) startPoll {
-    [activityView startAnimating];
-    statusLabel.text = @"scanning";
-    [statusLabel setNeedsDisplay];
+    if (!inBackground) {
+        [activityView startAnimating];
+        statusLabel.text = @"scanning";
+        [statusLabel setNeedsDisplay];
+    }
     [locationMGR initLocationServices];
     [locationMGR awaitLocationData:self];
 }
@@ -159,16 +171,19 @@
 - (void) locationDataAvailable: (CLLocation *)location {
     if (location == nil) {  // no location data at this time
         if (locationMGR.locationDenied) {  // never available
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Location data disabled"
-                                                                           message:@"This app requires it"
-                                                                    preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction* defaultAction = [UIAlertAction
-                                            actionWithTitle:@"Enable and try again"
-                                            style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction * action) {}
-                                            ];
-            [alert addAction:defaultAction];
-            [self presentViewController:alert animated:YES completion:nil];
+            NSLog(@"Location data never available");
+            if (!inBackground) {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Location data disabled"
+                                                                               message:@"This app requires it"
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction* defaultAction = [UIAlertAction
+                                                actionWithTitle:@"Enable and try again"
+                                                style:UIAlertActionStyleDefault
+                                                handler:^(UIAlertAction * action) {}
+                                                ];
+                [alert addAction:defaultAction];
+                [self presentViewController:alert animated:YES completion:nil];
+            }
         }
         return;
     }
@@ -180,54 +195,58 @@
     if ([self findCurrentApiary]) {
         NSLog(@"found current apiary: %@", currentApiary.name);
         self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
-        [self startBlueToothScan];
+        [self startBlueToothScan:nil];
     } else {    // Name the apiary, then start bluetooth scan
-        UIAlertController * alertController = [UIAlertController
-                                               alertControllerWithTitle: @"Local apiary name"
-                                               message: @"Enter name"
-                                               preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-            textField.placeholder = currentApiary.name;
-            textField.textColor = [UIColor blueColor];
-            textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-            textField.borderStyle = UITextBorderStyleRoundedRect;
-        }];
-        
-        UIPickerView *pickApiaryView = [[UIPickerView alloc] init];
-        pickApiaryView.dataSource = self;
-        pickApiaryView.delegate = self;
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-            textField.inputView = pickApiaryView;
-        }];
-
-        [alertController addAction:[UIAlertAction
-                                    actionWithTitle:@"OK"
-                                    style:UIAlertActionStyleDefault
-                                    handler:^(UIAlertAction *action) {
-                                        NSArray *textfields = alertController.textFields;
-                                        UITextField *namefield = textfields[0];
-                                        NSString *newName = namefield.text;
-                                        currentApiary = nil;
-                                        NSLog(@"apiary name is %@", newName);
-                                        for (int i=0; i<[apiaries count]; i++) {
-                                            Apiary *a = apiaries[i];
-                                            if ([newName isEqualToString:a.name]) { // existing apiary
-                                                currentApiary = a;
-                                                break;
+        if (inBackground) {
+            NSLog(@"XXXX apiary assignment in background, help");
+        } else {
+            UIAlertController * alertController = [UIAlertController
+                                                   alertControllerWithTitle: @"Local apiary name"
+                                                   message: @"Enter name"
+                                                   preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = currentApiary.name;
+                textField.textColor = [UIColor blueColor];
+                textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+                textField.borderStyle = UITextBorderStyleRoundedRect;
+            }];
+            
+            UIPickerView *pickApiaryView = [[UIPickerView alloc] init];
+            pickApiaryView.dataSource = self;
+            pickApiaryView.delegate = self;
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.inputView = pickApiaryView;
+            }];
+            
+            [alertController addAction:[UIAlertAction
+                                        actionWithTitle:@"OK"
+                                        style:UIAlertActionStyleDefault
+                                        handler:^(UIAlertAction *action) {
+                                            NSArray *textfields = alertController.textFields;
+                                            UITextField *namefield = textfields[0];
+                                            NSString *newName = namefield.text;
+                                            currentApiary = nil;
+                                            NSLog(@"apiary name is %@", newName);
+                                            for (int i=0; i<[apiaries count]; i++) {
+                                                Apiary *a = apiaries[i];
+                                                if ([newName isEqualToString:a.name]) { // existing apiary
+                                                    currentApiary = a;
+                                                    break;
+                                                }
                                             }
-                                        }
-                                        if (!currentApiary) {   // Create a new apiary
-                                            currentApiary = [[Apiary alloc] init];
-                                            currentApiary.location = currentLocation;
-                                            currentApiary.name = newName;
-                                            currentApiary.hives = [[NSMutableArray alloc] init];
-                                            [apiaries addObject:currentApiary];
-                                            [self updateApiaries];
-                                        }
-                                        self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
-                                        [self startBlueToothScan];
-                                    }]];
-        [self presentViewController:alertController animated:YES completion:nil];
+                                            if (!currentApiary) {   // Create a new apiary
+                                                currentApiary = [[Apiary alloc] init];
+                                                currentApiary.location = currentLocation;
+                                                currentApiary.name = newName;
+                                                currentApiary.hives = [[NSMutableArray alloc] init];
+                                                [apiaries addObject:currentApiary];
+                                                [self updateApiaries];
+                                            }
+                                            self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
+                                            [self startBlueToothScan:nil];
+                                        }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
     }
 }
 
@@ -254,12 +273,46 @@ numberOfRowsInComponent:(NSInteger)component {
     NSLog(@"picked %@", a.name);
 }
 
-#define SCAN_DURATION   30 // 45                      // seconds.  It gets most in about 10
-#define SCAN_FREQUENCY  120 //(100-SCAN_DURATION)    // seconds
 
-- (void) startBlueToothScan {
+#define SCAN_DURATION   30      // seconds
+#define IDLE_DURATION   120     // seconds.  Will be 3600
+
+- (void) goingToBackground {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    if (scanTimer) {    // we are still scanning, finish it now
+        [self finishScan: scanTimer];
+        backFireInterval = IDLE_DURATION;
+    } else {    // we are idled, disable the timer
+        NSDate *fireTime = idleTimer.fireDate;
+        backFireInterval = [fireTime timeIntervalSinceDate:[NSDate date]];
+    }
+    [scanTimer invalidate]; // switch to background timer
+}
+
+- (void) doBackgroundIdleCycles {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    inBackground = YES;
+    
+    [NSThread detachNewThreadWithBlock:^{
+        backgroundThread = [NSThread currentThread];
+        while (TRUE) {
+            NSLog(@"Thread sleeping for %d", backFireInterval);
+            [NSThread sleepForTimeInterval:backFireInterval];
+            backFireInterval = IDLE_DURATION;
+            [self startBlueToothScan: nil];
+        }
+    }];
+    
+}
+
+- (void) leftBackground {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+    inBackground = NO;
+}
+
+- (void) startBlueToothScan:(NSTimer *)t {
     [log logIPhoneStatus];
-    timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
+    scanTimer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                      target:self
                                            selector:@selector(finishScan:)
                                    userInfo:nil
@@ -269,24 +322,23 @@ numberOfRowsInComponent:(NSInteger)component {
 
 - (void) finishScan:(NSTimer *)t {
     if (DEBUG)
-        NSLog(@"Shut down for %ds.", SCAN_FREQUENCY);
+        NSLog(@"Finished scan");
+    scanTimer = nil;
+    
     statusLabel.text = @"";
-    [statusLabel setNeedsDisplay];
-    [activityView stopAnimating];
+    if (!inBackground) {
+        [statusLabel setNeedsDisplay];
+        [activityView stopAnimating];
+    }
     
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
     
-    timer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
+    idleTimer = [NSTimer scheduledTimerWithTimeInterval:IDLE_DURATION
                                              target:self
-                                           selector:@selector(timerStartScan:)
+                                           selector:@selector(startBlueToothScan:)
                                            userInfo:nil
                                             repeats:NO];
-}
-
-- (void) timerStartScan:(NSTimer *)t {
-    NSLog(@"Time's up, scan again");
-    [self startBlueToothScan];
 }
 
 // find the closest apiary to our current location.  If it isn't close enough,
@@ -337,7 +389,9 @@ numberOfRowsInComponent:(NSInteger)component {
     NSString *obsLogEntry = [device.lastObservation formatForLogging: device.name];
     [log add:obsLogEntry];
     [self updateDevices];
-    [self.tableView reloadData];
+    if (!inBackground) {
+        [self.tableView reloadData];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

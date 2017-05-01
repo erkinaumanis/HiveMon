@@ -27,6 +27,9 @@
 @property (strong, nonatomic)   OrderedDictionary *devices;
 
 - (void) startPoll;
+- (void) goingToBackground;
+- (void) doBackgroundIdleCycles;
+- (void) leftBackground;
 
 @end
 

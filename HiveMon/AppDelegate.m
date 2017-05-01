@@ -50,14 +50,27 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #ifdef DEBUG
     NSLog(@"applicationWillResignActive");
 #endif
+    [devicesVC goingToBackground];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-#ifdef DEBUG
-    NSLog(@"applicationDidEnterBackground");
-#endif
+    UIBackgroundTaskIdentifier __block bgTask = [application
+                                         beginBackgroundTaskWithName:@"BeeMonTask"
+                                         expirationHandler:^{
+        // Clean up any unfinished task business by marking where you
+        // stopped or ending the task outright.
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+    
+    // Start the long-running task and return immediately.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSLog(@"%s dispatch", __PRETTY_FUNCTION__);
+        [devicesVC doBackgroundIdleCycles];
+
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    });
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -72,6 +85,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #ifdef DEBUG
     NSLog(@"applicationDidBecomeActive");
 #endif
+    [devicesVC leftBackground];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
