@@ -12,6 +12,8 @@
 #import "OrderedDictionary.h"
 #import "Apiary.h"
 
+#import <unistd.h>
+
 @interface DevicesVC ()
 
 @property (strong, nonatomic)   BlueToothMGR *blueToothMGR;
@@ -280,11 +282,13 @@ numberOfRowsInComponent:(NSInteger)component {
 - (void) goingToBackground {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     if (scanTimer) {    // we are still scanning, finish it now
+        NSLog(@"  scan aborted");
         [self finishScan: scanTimer];
         backFireInterval = IDLE_DURATION;
     } else {    // we are idled, disable the timer
         NSDate *fireTime = idleTimer.fireDate;
         backFireInterval = [fireTime timeIntervalSinceDate:[NSDate date]];
+        NSLog(@"going into background, next fire interval: %f", backFireInterval);
     }
     [scanTimer invalidate]; // switch to background timer
 }
@@ -293,15 +297,16 @@ numberOfRowsInComponent:(NSInteger)component {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     inBackground = YES;
     
-    [NSThread detachNewThreadWithBlock:^{
-        backgroundThread = [NSThread currentThread];
-        while (TRUE) {
-            NSLog(@"Thread sleeping for %f", backFireInterval);
-            [NSThread sleepForTimeInterval:backFireInterval];
-            backFireInterval = IDLE_DURATION;
-            [self startBlueToothScan];
-        }
-    }];
+    backgroundThread = [NSThread currentThread];
+//    while (TRUE) {
+        backFireInterval = 3;
+//        NSLog(@"Thread sleeping for %f....", backFireInterval);
+//        [NSThread sleepForTimeInterval:backFireInterval];
+//       sleep(backFireInterval);
+        NSLog(@"... done sleeping");
+        backFireInterval = IDLE_DURATION;
+        [self startBlueToothScan];
+ //   }
 }
 
 - (void) leftBackground {
@@ -322,6 +327,7 @@ numberOfRowsInComponent:(NSInteger)component {
 - (void) finishScan:(NSTimer *)t {
     if (DEBUG)
         NSLog(@"Finished scan");
+    [t invalidate];
     scanTimer = nil;
     
     statusLabel.text = @"";
@@ -332,7 +338,7 @@ numberOfRowsInComponent:(NSInteger)component {
     [statusLabel setNeedsDisplay];
     [activityView stopAnimating];
     [locationMGR stopUpdatingLocation];
-    [blueToothMGR stopScan];
+//    [blueToothMGR stopScan];
     
     idleTimer = [NSTimer scheduledTimerWithTimeInterval:IDLE_DURATION
                                              target:self

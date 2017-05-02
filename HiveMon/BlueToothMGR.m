@@ -9,6 +9,9 @@
 #import "Defines.h"
 #import "BlueToothMGR.h"
 
+
+#define kBlueToothRestoreKey    @"BlueToothRestoreKey"
+
 @interface BlueToothMGR ()
 
 @property (nonatomic, strong)   CBCentralManager *centralMGR;
@@ -51,6 +54,7 @@
 }
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
+    NSLog(@"%s: state: %ld", __PRETTY_FUNCTION__, (long)central.state);
     switch (central.state) {
         case CBManagerStatePoweredOn:
             if (wantsScan)
