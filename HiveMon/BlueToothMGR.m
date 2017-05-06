@@ -200,7 +200,7 @@ int propertyList[] = {
 - (void)peripheral:(CBPeripheral *)peripheral
 didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
              error:(NSError *)error {
-    NSLog(@"CV  %@ %@ v:%@ %@ %@", [self PC:peripheral characteristic:characteristic],
+    NSLog(@"UV  %@ %@ v:%@ %@ %@", [self PC:peripheral characteristic:characteristic],
           [self CP:characteristic.properties],
           characteristic.value,
           characteristic.isNotifying ? @"Y" : @"N",
