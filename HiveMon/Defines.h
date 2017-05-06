@@ -12,6 +12,9 @@
 
 //#define CLEAR_FILES  //debug, clear everything
 
+#define kBlueToothManagerKey    @"BlueToothRestoreKey"
+
+
 #define APIARIES_ARCHIVE        @"./Apiaries"
 #define DEVICES_ARCHIVE         @"./Devices"
 #define OBSERVATIONS_LOG        @"./Observations.log"

@@ -57,7 +57,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #ifdef DEBUG
     NSLog(@"%s", __PRETTY_FUNCTION__);
 #endif
-#ifdef notdef
     UIBackgroundTaskIdentifier __block bgTask = [application
                                                  beginBackgroundTaskWithName:@"BeeMonTask"
                                                  expirationHandler:^{
@@ -69,13 +68,11 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                                                      NSLog(@"%s FINISHED", __PRETTY_FUNCTION__);
 #endif
                                                  }];
-#endif
-    
     // Start the long-running task and return immediately.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSLog(@"%s dispatch", __PRETTY_FUNCTION__);
         [devicesVC doBackgroundIdleCycles];
-        NSLog(@"%s dispatch FINISHED", __PRETTY_FUNCTION__);
+//        NSLog(@"%s dispatch FINISHED", __PRETTY_FUNCTION__);
 
 #ifdef notdef
         NSLog(@"%s dispatch", __PRETTY_FUNCTION__);

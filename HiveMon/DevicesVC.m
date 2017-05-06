@@ -26,9 +26,9 @@
 @property (strong, nonatomic)   UIView *statusView;
 @property (strong, nonatomic)   UILabel *statusLabel;
 @property (strong, nonatomic)   UIActivityIndicatorView *activityView;
-@property (assign)   BOOL inBackground;
+@property (assign)              BOOL inBackground;
 @property (nonatomic, strong)   NSThread *backgroundThread;
-@property (assign)   NSTimeInterval backFireInterval;
+@property (assign)              NSTimeInterval backFireInterval;
 
 
 @end
@@ -140,7 +140,7 @@
     UIBarButtonItem *statusBarItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
     self.navigationItem.leftBarButtonItem = statusBarItem;
 
-    blueToothMGR.delegate = self;
+    blueToothMGR.blueDelegate = self;
     [self startPoll];
 }
 
@@ -276,8 +276,8 @@ numberOfRowsInComponent:(NSInteger)component {
 }
 
 
-#define SCAN_DURATION   20      // seconds
-#define IDLE_DURATION   60     // seconds.  Will be 3600
+#define SCAN_DURATION   60      // seconds
+#define IDLE_DURATION   120     // seconds.  Will be 3600
 
 - (void) goingToBackground {
     NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -324,6 +324,19 @@ numberOfRowsInComponent:(NSInteger)component {
     [blueToothMGR startScan];
 }
 
+- (void) bluetoothError: (NSString *)err {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Bluetooth error"
+                                                                   message:err
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction* defaultAction = [UIAlertAction
+                                    actionWithTitle:@"OK"
+                                    style:UIAlertActionStyleDefault
+                                    handler:^(UIAlertAction * action) {}
+                                    ];
+    [alert addAction:defaultAction];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 - (void) finishScan:(NSTimer *)t {
     if (DEBUG)
         NSLog(@"Finished scan");
@@ -338,13 +351,15 @@ numberOfRowsInComponent:(NSInteger)component {
     [statusLabel setNeedsDisplay];
     [activityView stopAnimating];
     [locationMGR stopUpdatingLocation];
-//    [blueToothMGR stopScan];
+    [blueToothMGR stopScan];
     
+#ifdef OLD
     idleTimer = [NSTimer scheduledTimerWithTimeInterval:IDLE_DURATION
                                              target:self
                                            selector:@selector(startBlueToothScan)
                                            userInfo:nil
                                             repeats:NO];
+#endif
 }
 
 // find the closest apiary to our current location.  If it isn't close enough,
@@ -392,9 +407,16 @@ numberOfRowsInComponent:(NSInteger)component {
     
     device.apiaryName = currentApiary.name;
     device.lastObservation = [data makeObservation];
+    device.peripheral = data.peripheral;
     NSString *obsLogEntry = [device.lastObservation formatForLogging: device.name];
     [log add:obsLogEntry];
     [self updateDevices];
+    if (!inBackground) {
+        [self.tableView reloadData];
+    }
+}
+
+- (void) updatePeripheralStatus {
     if (!inBackground) {
         [self.tableView reloadData];
     }
@@ -449,8 +471,23 @@ numberOfRowsInComponent:(NSInteger)component {
     
     if (device.lastObservation) {  // we have current data for this device
         color = [UIColor blueColor];
-        label = [NSString stringWithFormat:@"%@ %3@ 🔋%.0d%% %3d°  %2d%%",
-                           label,
+        NSString *stateChar;
+        switch (device.peripheral.state) {
+            case CBPeripheralStateConnected:
+                stateChar = @"✓";
+                break;
+            case CBPeripheralStateConnecting:
+                stateChar = @"+";
+                break;
+            case CBPeripheralStateDisconnected:
+                stateChar = @"×";
+                break;
+            case CBPeripheralStateDisconnecting:
+                stateChar = @"-";
+                break;
+        }
+        label = [NSString stringWithFormat:@"%@%@ %3@ 🔋%.0d%% %3d°  %2d%%",
+                           label, stateChar,
                            device.lastObservation.rssi,
                            device.lastObservation.battery,
                            device.lastObservation.temperature,

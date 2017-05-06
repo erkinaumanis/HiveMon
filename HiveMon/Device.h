@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 
 #import "Hive.h"
 #import "Observation.h"
@@ -19,6 +20,7 @@
     NSString *hiveName;
     NSString *apiaryName;
     Observation *lastObservation;
+    CBPeripheral *peripheral;   // not saved between sessions
 }
 
 @property (nonatomic, strong)   NSDate *lastReport;
@@ -28,5 +30,6 @@
 @property (nonatomic, strong)   NSString *hiveName;
 @property (nonatomic, strong)   NSString *apiaryName;
 @property (nonatomic, strong)   Observation *lastObservation;
+@property (nonatomic, strong)   CBPeripheral *peripheral;
 
 @end
