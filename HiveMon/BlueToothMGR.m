@@ -59,8 +59,6 @@
     NSString *err = nil;
     switch (central.state) {
         case CBManagerStatePoweredOn:
-            if (wantsScan)
-                [self startScan];
             break;
         case CBManagerStateUnknown:
             err = @"Unknown bluetooth state";
@@ -68,7 +66,7 @@
         case CBManagerStateResetting:
             NSLog(@"Bluetooth resetting");
 //            err = @"Bluetooth resetting";
-            break;
+            return; // they will get back to us
         case CBManagerStateUnsupported:
             err = @"Bluetooth unsupported";
             break;
@@ -78,10 +76,11 @@
         case CBManagerStatePoweredOff:
             err = @"Bluetooth powered off";
     }
-    if (err) {
-        NSLog(@"Bluetooth status: %@", err);
-        [blueDelegate bluetoothError:err];
-    }
+    [blueDelegate updateBluetoothStatus: err];
+}
+
+- (BOOL) scanable {
+    return centralMGR.state == CBManagerStatePoweredOn;
 }
 
 - (void)centralManager:(CBCentralManager *)central
@@ -137,7 +136,7 @@
 
 - (void)centralManager:(CBCentralManager *)central
   didConnectPeripheral:(CBPeripheral *)peripheral {
-    NSLog(@"connected to %@:", [self P:peripheral]);
+    NSLog(@"connected to %@", [self P:peripheral]);
     [blueDelegate updatePeripheralStatus];
     if (![peripherals objectForKey:peripheral.identifier]) {
         NSLog(@"!!! surprise peripheral");
@@ -155,7 +154,7 @@
 didDiscoverServices:(NSError *)error{
 //    NSLog(@"%s *** %@: %@", __PRETTY_FUNCTION__, peripheral.identifier, peripheral);
     for (CBService *service in peripheral.services) {
-        NSLog(@"DS  %@", [self PS:peripheral service:service]);
+        NSLog(@"DS  %@  %@", [self PS:peripheral service:service], service.UUID);
         [peripheral discoverCharacteristics:nil forService:service];
     }
 }
@@ -165,8 +164,10 @@ didDiscoverCharacteristicsForService:(CBService *)service
              error:(NSError *)error; {
     for (CBCharacteristic *characteristic in service.characteristics) {
         BOOL readable = characteristic.properties & CBCharacteristicPropertyRead;
-        NSLog(@"DC  %@%@", [self PSC:peripheral service:service characteristic:characteristic],
-              readable ? @"" : @" (no read)");
+        NSLog(@"DC  %@ %@ %@  value:%@", [self PSC:peripheral service:service characteristic:characteristic],
+              readable ? @"   " : @" NR",
+              characteristic.UUID,
+              characteristic.value);
         if (readable)
             [peripheral readValueForCharacteristic:characteristic];
     }

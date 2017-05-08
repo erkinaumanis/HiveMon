@@ -26,7 +26,6 @@
 @property (strong, nonatomic)   NSMutableArray *apiaries;
 @property (strong, nonatomic)   OrderedDictionary *devices;
 
-- (void) startPoll;
 - (void) goingToBackground;
 - (void) doBackgroundIdleCycles;
 - (void) leftBackground;

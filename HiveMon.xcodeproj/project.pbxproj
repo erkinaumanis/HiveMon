@@ -21,6 +21,7 @@
 		FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */; };
 		FB3B5A0D1EAE71E800DFE11A /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */; };
 		FB7394741EB6353200B8D289 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7394731EB6353200B8D289 /* Log.m */; };
+		FB7394771EC09B1A00B8D289 /* UICircularProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7394761EC09B1A00B8D289 /* UICircularProgressView.m */; };
 		FBA7A5A71EB0DBE900E78BDD /* Observation.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A61EB0DBE900E78BDD /* Observation.m */; };
 		FBA7A5AA1EB2296400E78BDD /* Export.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A91EB2296400E78BDD /* Export.m */; };
 		FBA7A5AD1EB236FB00E78BDD /* SendMail.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5AC1EB236FB00E78BDD /* SendMail.m */; };
@@ -54,6 +55,8 @@
 		FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FB7394721EB6353200B8D289 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		FB7394731EB6353200B8D289 /* Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Log.m; sourceTree = "<group>"; };
+		FB7394751EC09B1A00B8D289 /* UICircularProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICircularProgressView.h; sourceTree = "<group>"; };
+		FB7394761EC09B1A00B8D289 /* UICircularProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UICircularProgressView.m; sourceTree = "<group>"; };
 		FBA7A5A51EB0DBE900E78BDD /* Observation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observation.h; sourceTree = "<group>"; };
 		FBA7A5A61EB0DBE900E78BDD /* Observation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Observation.m; sourceTree = "<group>"; };
 		FBA7A5A81EB2296400E78BDD /* Export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Export.h; sourceTree = "<group>"; };
@@ -122,6 +125,8 @@
 				FBA7A5AC1EB236FB00E78BDD /* SendMail.m */,
 				FB03B64A1EAE93F100954A00 /* OrderedDictionary.h */,
 				FB03B64B1EAE93F100954A00 /* OrderedDictionary.m */,
+				FB7394751EC09B1A00B8D289 /* UICircularProgressView.h */,
+				FB7394761EC09B1A00B8D289 /* UICircularProgressView.m */,
 				FB3B59ED1EAE5EAC00DFE11A /* Supporting Files */,
 			);
 			path = HiveMon;
@@ -224,6 +229,7 @@
 				FB3B59F51EAE5EAC00DFE11A /* DevicesVC.m in Sources */,
 				FB03B64C1EAE93F100954A00 /* OrderedDictionary.m in Sources */,
 				FB03B65D1EAF80F600954A00 /* LocationMGR.m in Sources */,
+				FB7394771EC09B1A00B8D289 /* UICircularProgressView.m in Sources */,
 				FB03B6551EAF785E00954A00 /* Hive.m in Sources */,
 				FB03B6521EAF782700954A00 /* Device.m in Sources */,
 				FBA7A5AA1EB2296400E78BDD /* Export.m in Sources */,

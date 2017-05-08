@@ -11,6 +11,7 @@
 #import "Device.h"
 #import "OrderedDictionary.h"
 #import "Apiary.h"
+#import "UICircularProgressView.h"
 
 #import <unistd.h>
 
@@ -22,13 +23,17 @@
 @property (strong, nonatomic)   Apiary *currentApiary;
 @property (strong, nonatomic)   NSTimer *scanTimer;
 @property (strong, nonatomic)   NSTimer *idleTimer;
+@property (strong, nonatomic)   NSTimer *scanTickTimer;
 @property (strong, nonatomic)   Log *log;
 @property (strong, nonatomic)   UIView *statusView;
 @property (strong, nonatomic)   UILabel *statusLabel;
-@property (strong, nonatomic)   UIActivityIndicatorView *activityView;
+@property (strong, nonatomic)   UICircularProgressView *progressView;
 @property (assign)              BOOL inBackground;
+@property (assign)              BOOL scanWanted;
 @property (nonatomic, strong)   NSThread *backgroundThread;
 @property (assign)              NSTimeInterval backFireInterval;
+@property (nonatomic, strong)   UIBarButtonItem *scanningStatusButton;
+@property (nonatomic, strong)   UIBarButtonItem *notScanningStatusButton;
 
 
 @end
@@ -42,10 +47,13 @@
 @synthesize apiaries;
 @synthesize devices;
 @synthesize log;
-@synthesize scanTimer, idleTimer;
-@synthesize statusView, statusLabel, activityView;
+@synthesize scanWanted;
+@synthesize scanTimer, idleTimer, scanTickTimer;
+@synthesize statusView, statusLabel, progressView;
 @synthesize inBackground, backgroundThread;
 @synthesize backFireInterval;
+@synthesize scanningStatusButton;
+@synthesize notScanningStatusButton;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -54,7 +62,9 @@
         scanTimer = idleTimer = nil;
         log = [[Log alloc] init];
         inBackground = NO;
+        scanWanted = NO;
         backgroundThread = nil;
+        scanTickTimer = nil;
         
 #ifdef CLEAR_FILES
         [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
@@ -88,7 +98,6 @@
         // Start services
         blueToothMGR = [[BlueToothMGR alloc] init];
         locationMGR = [[LocationMGR alloc] init];
-        
     }
     return self;
 }
@@ -121,30 +130,33 @@
     f.size.width = STATUS_VIEW_W;
     statusView = [[UIView alloc] initWithFrame:f];
     
-    activityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    activityView.frame = CGRectMake(-20, 0,
-                                    f.size.height,  // square field
-                                    f.size.height);
-    activityView.hidesWhenStopped = YES;
-    activityView.backgroundColor = [UIColor clearColor];
-    [statusView addSubview:activityView];
+    f.size.height /= 2;
+    f.size.width = f.size.height;
+    f.origin.x = 0;
+    f.origin.y = f.size.height/2;
+    progressView = [[UICircularProgressView alloc] initWithFrame:f];
+    progressView.backgroundColor = [UIColor clearColor];
+    [statusView addSubview:progressView];
     
-    statusLabel = [[UILabel alloc] initWithFrame:
-                   CGRectMake(activityView.frame.origin.x + activityView.frame.size.width - 5, 10,
-                              statusView.frame.size.width - activityView.frame.size.width,
-                              f.size.height-10)];
+    f.origin.x = RIGHT(f);
+    f.size.width = statusView.frame.size.width - f.origin.x;
+    statusLabel = [[UILabel alloc] initWithFrame:f];
     statusLabel.text = @"";
-    statusLabel.font = [UIFont systemFontOfSize:12];
+    statusLabel.font = [UIFont systemFontOfSize:10];
     [statusView addSubview:statusLabel];
-   
-    UIBarButtonItem *statusBarItem = [[UIBarButtonItem alloc] initWithCustomView:statusView];
-    self.navigationItem.leftBarButtonItem = statusBarItem;
+    scanningStatusButton = [[UIBarButtonItem alloc] initWithCustomView:statusView];
+    
+    notScanningStatusButton = [[UIBarButtonItem alloc]
+                               initWithTitle:@"Scan"
+                               style:UIBarButtonItemStylePlain
+                               target:self
+                               action:@selector(tryScanStart)];
+    self.navigationItem.leftBarButtonItem = notScanningStatusButton;
 
     blueToothMGR.blueDelegate = self;
-    [self startPoll];
+    [locationMGR initLocationServices];
+    [locationMGR awaitLocationData:self];
 }
-
-//908 534 1486 shell
 
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -155,19 +167,52 @@
     self.navigationController.toolbar.opaque = YES;
     self.navigationController.toolbar.translucent = NO;
     self.navigationController.toolbarHidden = NO;
-    
-    //    SET_VIEW_WIDTH(iCloudHeaderView, self.view.frame.size.width);
-    //    SET_VIEW_WIDTH(localHeaderView, self.view.frame.size.width);
 }
 
-- (void) startPoll {
+- (void) viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self tryScanStart];
+}
+
+- (void) scanStartButtonPressed {
+    [self tryScanStart];
+}
+
+- (void) tryScanStart {
+    if (!currentLocation || ![blueToothMGR scanable]) {
+        scanWanted = YES;
+        return;
+    }
+    
     if (!inBackground) {
-        [activityView startAnimating];
+        self.navigationItem.leftBarButtonItem = scanningStatusButton;
+        progressView.progress = 0.0;
         statusLabel.text = @"scanning";
         [statusLabel setNeedsDisplay];
     }
-    [locationMGR initLocationServices];
-    [locationMGR awaitLocationData:self];
+    [self startBlueToothScan];
+}
+
+- (void) updateBluetoothStatus: (NSString *)error {
+    NSLog(@"new bluetooth status: %@", error);
+    if (!error) {
+        [self tryScanStart];
+        return;
+    }
+    
+    if (!inBackground) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Bluetooth unavailable"
+                                                                       message:@"error"
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction* defaultAction = [UIAlertAction
+                                        actionWithTitle:@"Fix and try again"
+                                        style:UIAlertActionStyleDefault
+                                        handler:^(UIAlertAction * action) {}
+                                        ];
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
 }
 
 - (void) locationDataAvailable: (CLLocation *)location {
@@ -190,14 +235,15 @@
         return;
     }
     currentLocation = location;
-    [self startApiaryScan];
+    [self determineApiary];
+    [self tryScanStart];
 }
 
-- (void) startApiaryScan {
+- (void) determineApiary {
     if ([self findCurrentApiary]) {
         NSLog(@"found current apiary: %@", currentApiary.name);
         self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
-        [self startBlueToothScan];
+        [self tryScanStart];
     } else {    // Name the apiary, then start bluetooth scan
         if (inBackground) {
             NSLog(@"XXXX apiary assignment in background, help");
@@ -275,10 +321,6 @@ numberOfRowsInComponent:(NSInteger)component {
     NSLog(@"picked %@", a.name);
 }
 
-
-#define SCAN_DURATION   60      // seconds
-#define IDLE_DURATION   120     // seconds.  Will be 3600
-
 - (void) goingToBackground {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     if (scanTimer) {    // we are still scanning, finish it now
@@ -321,7 +363,22 @@ numberOfRowsInComponent:(NSInteger)component {
                                            selector:@selector(finishScan:)
                                    userInfo:nil
                                     repeats:NO];
+    if (!inBackground) {
+        scanTickTimer= [NSTimer scheduledTimerWithTimeInterval:1
+                                                        target:self
+                                                      selector:@selector(updateScanProgress:)
+                                                      userInfo:nil
+                                                       repeats:YES];
+    }
+
     [blueToothMGR startScan];
+}
+
+- (void) updateScanProgress:(NSTimer *)t {
+    NSTimeInterval secs = [scanTimer.fireDate timeIntervalSinceDate:[NSDate date]];
+    float fraction = (SCAN_DURATION - secs)/SCAN_DURATION;
+    progressView.progress = fraction;
+    [progressView setNeedsDisplay];
 }
 
 - (void) bluetoothError: (NSString *)err {
@@ -340,8 +397,10 @@ numberOfRowsInComponent:(NSInteger)component {
 - (void) finishScan:(NSTimer *)t {
     if (DEBUG)
         NSLog(@"Finished scan");
-    [t invalidate];
+    [scanTimer invalidate];
     scanTimer = nil;
+    [scanTickTimer invalidate];
+    scanTickTimer = nil;
     
     statusLabel.text = @"";
     if (inBackground) {
@@ -349,17 +408,9 @@ numberOfRowsInComponent:(NSInteger)component {
     }
     
     [statusLabel setNeedsDisplay];
-    [activityView stopAnimating];
+    self.navigationItem.leftBarButtonItem = notScanningStatusButton;
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
-    
-#ifdef OLD
-    idleTimer = [NSTimer scheduledTimerWithTimeInterval:IDLE_DURATION
-                                             target:self
-                                           selector:@selector(startBlueToothScan)
-                                           userInfo:nil
-                                            repeats:NO];
-#endif
 }
 
 // find the closest apiary to our current location.  If it isn't close enough,
@@ -385,11 +436,6 @@ numberOfRowsInComponent:(NSInteger)component {
         return minDistance <= APIARY_CLOSE_ENOUGH;
     } else
         return NO;
-}
-
-- (void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
 }
 
 // We have fresh data about a device

@@ -14,8 +14,8 @@
 @protocol BlueDelegate <NSObject>
 
 - (void) newData: (BMData *)data;
+- (void) updateBluetoothStatus: (NSString *)error;
 - (void) updatePeripheralStatus;
-- (void) bluetoothError: (NSString *)err;
 
 @end
 
@@ -29,5 +29,6 @@
 
 - (void) startScan;
 - (void) stopScan;
+- (BOOL) scanable;
 
 @end
