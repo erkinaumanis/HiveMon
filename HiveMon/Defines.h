@@ -13,7 +13,7 @@
 //#define CLEAR_FILES  //debug, clear everything
 
 
-#define SCAN_DURATION   20      // seconds
+#define SCAN_DURATION   30      // seconds
 #define IDLE_DURATION   120     // seconds.  Will be 3600
 
 #define kBlueToothManagerKey    @"BlueToothRestoreKey"

@@ -14,6 +14,7 @@
 @property (nonatomic, strong)   CBCentralManager *centralMGR;
 @property (assign)              BOOL wantsScan;
 @property (strong,nonatomic)    NSMutableDictionary *peripherals;
+@property (strong, nonatomic)   NSTimer *testTimer;
 
 @end
 
@@ -23,6 +24,7 @@
 @synthesize wantsScan;
 @synthesize blueDelegate;
 @synthesize peripherals;
+@synthesize testTimer;
 
 
 - (id)init {
@@ -100,6 +102,26 @@
     [blueDelegate newData:data];
 }
 
+- (void)centralManager:(CBCentralManager *)central
+  didConnectPeripheral:(CBPeripheral *)peripheral {
+    NSLog(@"connected to %@", [self P:peripheral]);
+    [blueDelegate updatePeripheralStatus];
+    if (![peripherals objectForKey:peripheral.identifier]) {
+        NSLog(@"!!! surprise peripheral");
+    }
+    testTimer = [NSTimer scheduledTimerWithTimeInterval:630
+                                                   target:self
+                                               selector:@selector(discon:)
+                                                 userInfo:peripheral
+                                                  repeats:NO];
+    //    [peripheral discoverServices:NULL];
+}
+
+- (void)discon:(id) p {
+    NSLog(@"timed disconnection");
+    [centralMGR cancelPeripheralConnection:(CBPeripheral *)p];
+}
+
 - (NSString *)P: (CBPeripheral *)p {
     NSString *uuid = p.identifier.UUIDString;
     return [uuid substringFromIndex:MAX((int)[uuid length]-3, 0)];
@@ -132,16 +154,6 @@
     characteristic:(CBCharacteristic *)c{
     return [NSString stringWithFormat:@"%@/%@/%@",
             [self P:p], [self S:s], [self C:c]];
-}
-
-- (void)centralManager:(CBCentralManager *)central
-  didConnectPeripheral:(CBPeripheral *)peripheral {
-    NSLog(@"connected to %@", [self P:peripheral]);
-    [blueDelegate updatePeripheralStatus];
-    if (![peripherals objectForKey:peripheral.identifier]) {
-        NSLog(@"!!! surprise peripheral");
-    }
-    [peripheral discoverServices:NULL];
 }
 
 - (void)centralManager:(CBCentralManager *)central
@@ -195,7 +207,7 @@ int propertyList[] = {
         NSString *f = (cp & propertyList[i]) ? ch : [ch lowercaseString];
         flags = [f stringByAppendingString:flags];
     }
-    return [NSString stringWithFormat:@"%03x:%@", cp, flags];
+    return [NSString stringWithFormat:@"%03lx:%@", (unsigned long)cp, flags];
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral

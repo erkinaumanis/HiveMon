@@ -24,6 +24,7 @@
 @property (strong, nonatomic)   NSTimer *scanTimer;
 @property (strong, nonatomic)   NSTimer *idleTimer;
 @property (strong, nonatomic)   NSTimer *scanTickTimer;
+@property (strong, nonatomic)   NSTimer *backgroundTimer;
 @property (strong, nonatomic)   Log *log;
 @property (strong, nonatomic)   UIView *statusView;
 @property (strong, nonatomic)   UILabel *statusLabel;
@@ -49,6 +50,7 @@
 @synthesize log;
 @synthesize scanWanted;
 @synthesize scanTimer, idleTimer, scanTickTimer;
+@synthesize backgroundTimer;
 @synthesize statusView, statusLabel, progressView;
 @synthesize inBackground, backgroundThread;
 @synthesize backFireInterval;
@@ -65,6 +67,7 @@
         scanWanted = NO;
         backgroundThread = nil;
         scanTickTimer = nil;
+        backgroundTimer = nil;
         
 #ifdef CLEAR_FILES
         [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
@@ -323,9 +326,9 @@ numberOfRowsInComponent:(NSInteger)component {
 
 - (void) goingToBackground {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    if (scanTimer) {    // we are still scanning, finish it now
+    if (scanTimer) {    // we are still scanning, abort it
         NSLog(@"  scan aborted");
-        [self finishScan: scanTimer];
+        [self finishScan];
         backFireInterval = IDLE_DURATION;
     } else {    // we are idled, disable the timer
         NSDate *fireTime = idleTimer.fireDate;
@@ -340,7 +343,14 @@ numberOfRowsInComponent:(NSInteger)component {
     inBackground = YES;
     
     backgroundThread = [NSThread currentThread];
-//    while (TRUE) {
+    backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:600
+                                                                target:self
+                                                              selector:@selector(backgroundTick)
+                                                              userInfo:nil
+                                                               repeats:YES];
+
+#ifdef notdef
+    //    while (TRUE) {
         backFireInterval = 3;
 //        NSLog(@"Thread sleeping for %f....", backFireInterval);
 //        [NSThread sleepForTimeInterval:backFireInterval];
@@ -349,6 +359,11 @@ numberOfRowsInComponent:(NSInteger)component {
         backFireInterval = IDLE_DURATION;
         [self startBlueToothScan];
  //   }
+#endif
+}
+
+- (void) backgroundTick {
+    NSLog(@"------------ tick ---------- ");
 }
 
 - (void) leftBackground {
@@ -360,7 +375,7 @@ numberOfRowsInComponent:(NSInteger)component {
     [log logIPhoneStatus];
     scanTimer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                      target:self
-                                           selector:@selector(finishScan:)
+                                           selector:@selector(finishScan)
                                    userInfo:nil
                                     repeats:NO];
     if (!inBackground) {
@@ -394,7 +409,7 @@ numberOfRowsInComponent:(NSInteger)component {
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (void) finishScan:(NSTimer *)t {
+- (void) finishScan {
     if (DEBUG)
         NSLog(@"Finished scan");
     [scanTimer invalidate];

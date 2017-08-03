@@ -41,6 +41,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                           initWithRootViewController: devicesVC];
     self.window.rootViewController = navController;
     [self.window makeKeyAndVisible];
+    NSLog(@"starting thread: %@", [NSThread currentThread].name);
     return YES;
 }
 
@@ -48,14 +49,14 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 #ifdef DEBUG
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"%s: %@", __PRETTY_FUNCTION__,  [NSThread currentThread].name);
 #endif
     [devicesVC goingToBackground];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 #ifdef DEBUG
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"%s: %@", __PRETTY_FUNCTION__,  [NSThread currentThread].name);
 #endif
     UIBackgroundTaskIdentifier __block bgTask = [application
                                                  beginBackgroundTaskWithName:@"BeeMonTask"
@@ -65,12 +66,12 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                                                      [application endBackgroundTask:bgTask];
                                                      bgTask = UIBackgroundTaskInvalid;
 #ifdef DEBUG
-                                                     NSLog(@"%s FINISHED", __PRETTY_FUNCTION__);
+                                                     NSLog(@"%s EXPIRED: %@", __PRETTY_FUNCTION__,  [NSThread currentThread].name);
 #endif
                                                  }];
     // Start the long-running task and return immediately.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSLog(@"%s dispatch", __PRETTY_FUNCTION__);
+        NSLog(@"%s dispatch: %@", __PRETTY_FUNCTION__,  [NSThread currentThread].name);
         [devicesVC doBackgroundIdleCycles];
 //        NSLog(@"%s dispatch FINISHED", __PRETTY_FUNCTION__);
 
