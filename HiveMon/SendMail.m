@@ -85,6 +85,7 @@
     
 }
 
+#ifdef notdef
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated: (BOOL)flag completion:(void (^ __nullable)(void))completion NS_AVAILABLE_IOS(5_0);
 
 - (void) csend: (NSString *) cmd {
@@ -92,6 +93,6 @@
 }
 
 - (NSString *) expect: (NSString *)
-
+#endif
 
 @end
