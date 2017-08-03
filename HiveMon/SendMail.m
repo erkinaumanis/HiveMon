@@ -17,6 +17,7 @@
 
 #define SMTP_PORT   25
 
+
 #include <unistd.h>
 
 #import "SendMail.h"
@@ -52,6 +53,7 @@
 - (NSString *) sendMail:(NSString *) dest
                 message:(NSString *) mess
                delegate:(id<SendMailProto>) del {
+#ifdef UNDERCONSTRUCTION
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocketToHost(NULL, (CFStringRef)BEEMON_MAIL_SERVER, SMTP_PORT,
@@ -77,12 +79,33 @@
     self.delegate = del;
     self.message = mess;
     self.destination = dest;
-    [self doHELO];
+    [self awaitResponseWithin: 20.0 completion:^{
+        [self doHELO];
+    }];
+#endif
     return nil;
 }
 
-- (void) doHELO {
+#ifdef UNDERCONSTRUCTION
+- (void)awaitResponseWithin: (NSTimeInterval) timeout
+                 completion:(void (^)(void))onSuccess {
+    inputStream.
+}
+
+- (void) reportResults:(NSString *)reply {
+    NSString *m;
+    int code;
+    snmp_status status;
     
+    [delegate mailCompleted:status message:m];
+}
+
+- (void) doHELO {
+    NSString *hostName;
+    [self csend: @"HELO"];
+    [self awaitReponseWithin: 10.0 completion:^(NSString *message) {
+        [self doHELO];
+    }];
 }
 
 #ifdef notdef
@@ -91,6 +114,7 @@
 - (void) csend: (NSString *) cmd {
     
 }
+#endif
 
 - (NSString *) expect: (NSString *)
 #endif

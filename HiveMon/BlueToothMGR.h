@@ -14,17 +14,21 @@
 @protocol BlueDelegate <NSObject>
 
 - (void) newData: (BMData *)data;
+- (void) updateBluetoothStatus: (NSString *)error;
+- (void) updatePeripheralStatus;
 
 @end
 
 @interface BlueToothMGR: NSObject
-<CBCentralManagerDelegate> {
-    __unsafe_unretained id<BlueDelegate> delegate;
+    <CBCentralManagerDelegate,
+    CBPeripheralDelegate> {
+    __unsafe_unretained id<BlueDelegate> blueDelegate;
 }
 
-@property (assign)  __unsafe_unretained id<BlueDelegate> delegate;
+@property (assign)  __unsafe_unretained id<BlueDelegate> blueDelegate;
 
 - (void) startScan;
 - (void) stopScan;
+- (BOOL) scanable;
 
 @end

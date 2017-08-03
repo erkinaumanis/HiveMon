@@ -24,6 +24,7 @@
 @synthesize displayLabel;
 @synthesize lastObservation;
 @synthesize isScale;
+@synthesize peripheral;
 
 
 - (id)init {
@@ -34,6 +35,7 @@
         name = @"";
         displayLabel = @"";
         lastObservation = nil;
+        peripheral = nil;
     }
     return self;
 }
@@ -48,6 +50,7 @@
         apiaryName = [coder decodeObjectForKey: kApiaryName];
         isScale = [coder decodeBoolForKey:kIsScale];
         lastObservation = nil;
+        peripheral = nil;
     }
     return self;
 }

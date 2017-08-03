@@ -59,18 +59,16 @@
     [coder encodeDouble:weight forKey:kWeight];
 }
 
-- (NSString *) formatForLogging: (NSString *)deviceName {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyyMMdd_HHmmss"];
-    [dateFormatter setLocale:[NSLocale currentLocale]];
-    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
-    NSString *stamp = [dateFormatter stringFromDate:timeStamp];
+// {w|S},battery,samples,temp,humidity
 
-    NSString *logInfo = [NSString stringWithFormat:@"%@,%@,%d,%d,%d,%d",
-                         stamp, deviceName, battery, samples, temperature, humidity];
+- (NSString *) formatForLogging: (NSString *)deviceName {
+    NSString *logInfo = [NSString stringWithFormat:@"%@,%d,%d,%d,%d",
+                         deviceName, battery, samples, temperature, humidity];
     if (weight)    // not a scale
         logInfo = [NSString stringWithFormat:@"%@,%.2f", logInfo,weight];
-    return logInfo;
+    return [NSString stringWithFormat:@"%@,%@",
+            weight ? @"W" : @"S",
+            logInfo];
 }
 
 @end

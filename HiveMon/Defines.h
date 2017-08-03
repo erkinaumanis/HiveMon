@@ -10,11 +10,19 @@
 #define Defines_h
 
 
-#define kBlueToothRestoreKey    @"BlueToothRestoreKey"
+//#define CLEAR_FILES  //debug, clear everything
+
+
+#define SCAN_DURATION   30      // seconds
+#define IDLE_DURATION   120     // seconds.  Will be 3600
+
+#define kBlueToothManagerKey    @"BlueToothRestoreKey"
+
 
 #define APIARIES_ARCHIVE        @"./Apiaries"
 #define DEVICES_ARCHIVE         @"./Devices"
 #define OBSERVATIONS_LOG        @"./Observations.log"
+#define BEEMON_LOG              @"./BeeMon.log"
 
 #define USED(x) ((void)(x))
 

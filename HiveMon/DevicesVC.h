@@ -10,7 +10,7 @@
 #import "OrderedDictionary.h"
 #import "BlueToothMGR.h"
 #import "LocationMGR.h"
-#import "SendMail.h"
+#import "Log.h"
 
 @interface DevicesVC : UITableViewController
     <UITableViewDelegate,
@@ -26,7 +26,9 @@
 @property (strong, nonatomic)   NSMutableArray *apiaries;
 @property (strong, nonatomic)   OrderedDictionary *devices;
 
-- (void) startPoll;
+- (void) goingToBackground;
+- (void) doBackgroundIdleCycles;
+- (void) leftBackground;
 
 @end
 
