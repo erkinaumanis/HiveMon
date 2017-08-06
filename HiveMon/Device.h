@@ -32,4 +32,7 @@
 @property (nonatomic, strong)   Observation *lastObservation;
 @property (nonatomic, strong)   CBPeripheral *peripheral;
 
+- (NSString *) statusString;
+- (NSString *) detailStatus;
+
 @end

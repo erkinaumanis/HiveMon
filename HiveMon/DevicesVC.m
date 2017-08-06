@@ -12,6 +12,7 @@
 #import "OrderedDictionary.h"
 #import "Apiary.h"
 #import "UICircularProgressView.h"
+#import "DeviceVC.h"
 
 #import <unistd.h>
 
@@ -31,11 +32,16 @@
 @property (strong, nonatomic)   UICircularProgressView *progressView;
 @property (assign)              BOOL inBackground;
 @property (assign)              BOOL scanWanted;
+@property (assign)              BOOL scanning;
+@property (assign)              BOOL showDetails;
 @property (nonatomic, strong)   NSThread *backgroundThread;
 @property (assign)              NSTimeInterval backFireInterval;
 @property (nonatomic, strong)   UIBarButtonItem *scanningStatusButton;
 @property (nonatomic, strong)   UIBarButtonItem *notScanningStatusButton;
 
+@property (nonatomic, strong)   OrderedDictionary *displayedDevices;
+
+@property (assign)              BOOL autoApiary;
 
 @end
 
@@ -48,7 +54,8 @@
 @synthesize apiaries;
 @synthesize devices;
 @synthesize log;
-@synthesize scanWanted;
+@synthesize scanWanted, scanning;
+@synthesize showDetails;
 @synthesize scanTimer, idleTimer, scanTickTimer;
 @synthesize backgroundTimer;
 @synthesize statusView, statusLabel, progressView;
@@ -56,6 +63,9 @@
 @synthesize backFireInterval;
 @synthesize scanningStatusButton;
 @synthesize notScanningStatusButton;
+@synthesize displayedDevices;
+
+@synthesize autoApiary;
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
@@ -68,6 +78,10 @@
         backgroundThread = nil;
         scanTickTimer = nil;
         backgroundTimer = nil;
+        displayedDevices = nil;
+        autoApiary = NO;
+        scanning = NO;
+        showDetails = YES;
         
 #ifdef CLEAR_FILES
         [[NSFileManager defaultManager] removeItemAtPath:APIARIES_ARCHIVE error:nil];
@@ -129,6 +143,8 @@
     
     self.title = @"Devices";
     
+    displayedDevices = [[OrderedDictionary alloc] init];
+    
     CGRect f = self.navigationController.navigationBar.frame;
     f.size.width = STATUS_VIEW_W;
     statusView = [[UIView alloc] initWithFrame:f];
@@ -154,7 +170,7 @@
                                style:UIBarButtonItemStylePlain
                                target:self
                                action:@selector(tryScanStart)];
-    self.navigationItem.leftBarButtonItem = notScanningStatusButton;
+    self.navigationItem.rightBarButtonItem = notScanningStatusButton;
 
     blueToothMGR.blueDelegate = self;
     [locationMGR initLocationServices];
@@ -175,7 +191,8 @@
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    [self tryScanStart];
+    if (!scanning)
+        [self tryScanStart];
 }
 
 - (void) scanStartButtonPressed {
@@ -183,13 +200,16 @@
 }
 
 - (void) tryScanStart {
-    if (!currentLocation || ![blueToothMGR scanable]) {
+    if (![blueToothMGR scanable]) {
         scanWanted = YES;
+        return;
+    }
+    if (!currentLocation && autoApiary) {
         return;
     }
     
     if (!inBackground) {
-        self.navigationItem.leftBarButtonItem = scanningStatusButton;
+        self.navigationItem.rightBarButtonItem = scanningStatusButton;
         progressView.progress = 0.0;
         statusLabel.text = @"scanning";
         [statusLabel setNeedsDisplay];
@@ -198,7 +218,7 @@
 }
 
 - (void) updateBluetoothStatus: (NSString *)error {
-    NSLog(@"new bluetooth status: %@", error);
+    NSLog(@"new bluetooth status: %@", error ? error : @"OK");
     if (!error) {
         [self tryScanStart];
         return;
@@ -238,7 +258,8 @@
         return;
     }
     currentLocation = location;
-    [self determineApiary];
+    if (autoApiary)
+        [self determineApiary];
     [self tryScanStart];
 }
 
@@ -296,7 +317,13 @@
                                             self.title = [NSString stringWithFormat:@"Apiary: %@", currentApiary.name];
                                             [self startBlueToothScan];
                                         }]];
-            [self presentViewController:alertController animated:YES completion:nil];
+            [alertController addAction:[UIAlertAction
+                                        actionWithTitle:@"Skip"
+                                        style:UIAlertActionStyleDefault
+                                        handler:nil
+                                        ]
+             ];
+           [self presentViewController:alertController animated:YES completion:nil];
         }
     }
 }
@@ -348,7 +375,6 @@ numberOfRowsInComponent:(NSInteger)component {
                                                               selector:@selector(backgroundTick)
                                                               userInfo:nil
                                                                repeats:YES];
-
 #ifdef notdef
     //    while (TRUE) {
         backFireInterval = 3;
@@ -373,6 +399,7 @@ numberOfRowsInComponent:(NSInteger)component {
 
 - (void) startBlueToothScan {
     [log logIPhoneStatus];
+    scanning = YES;
     scanTimer = [NSTimer scheduledTimerWithTimeInterval:SCAN_DURATION
                                      target:self
                                            selector:@selector(finishScan)
@@ -414,6 +441,7 @@ numberOfRowsInComponent:(NSInteger)component {
         NSLog(@"Finished scan");
     [scanTimer invalidate];
     scanTimer = nil;
+    scanning = NO;
     [scanTickTimer invalidate];
     scanTickTimer = nil;
     
@@ -423,7 +451,7 @@ numberOfRowsInComponent:(NSInteger)component {
     }
     
     [statusLabel setNeedsDisplay];
-    self.navigationItem.leftBarButtonItem = notScanningStatusButton;
+    self.navigationItem.rightBarButtonItem = notScanningStatusButton;
     [locationMGR stopUpdatingLocation];
     [blueToothMGR stopScan];
 }
@@ -472,6 +500,9 @@ numberOfRowsInComponent:(NSInteger)component {
     NSString *obsLogEntry = [device.lastObservation formatForLogging: device.name];
     [log add:obsLogEntry];
     [self updateDevices];
+    if (![displayedDevices objectForKey:device.name]) {
+        [displayedDevices addObject:device withKey:device.name];
+    }
     if (!inBackground) {
         [self.tableView reloadData];
     }
@@ -497,11 +528,13 @@ numberOfRowsInComponent:(NSInteger)component {
 }
 
 #ifdef notdef
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView
+heightForHeaderInSection:(NSInteger)section {
     return [discoveredPeripherals count];
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+- (UIView *)tableView:(UITableView *)tableView
+viewForHeaderInSection:(NSInteger)section {
     switch (section) {
         case EnvelopeInCloudSection:
             return iCloudHeaderView;
@@ -513,8 +546,9 @@ numberOfRowsInComponent:(NSInteger)component {
 }
 #endif
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [devices count];
+- (NSInteger)tableView:(UITableView *)tableView
+ numberOfRowsInSection:(NSInteger)section {
+    return [displayedDevices count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -523,45 +557,59 @@ numberOfRowsInComponent:(NSInteger)component {
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
-
-    Device *device = [devices
-                     objectAtIndex:indexPath.row];
     
-    NSString *label = [NSString stringWithFormat:@"%@", [devices keyAtIndex:indexPath.row]];
-    UIColor *color = [UIColor redColor];
+    Device *device = [displayedDevices
+                      objectAtIndex:indexPath.row];
     
-    if (device.lastObservation) {  // we have current data for this device
-        color = [UIColor blueColor];
-        NSString *stateChar;
-        switch (device.peripheral.state) {
-            case CBPeripheralStateConnected:
-                stateChar = @"✓";
-                break;
-            case CBPeripheralStateConnecting:
-                stateChar = @"+";
-                break;
-            case CBPeripheralStateDisconnected:
-                stateChar = @"×";
-                break;
-            case CBPeripheralStateDisconnecting:
-                stateChar = @"-";
-                break;
-        }
-        label = [NSString stringWithFormat:@"%@%@ %3@ 🔋%.0d%% %3d°  %2d%%",
-                           label, stateChar,
-                           device.lastObservation.rssi,
-                           device.lastObservation.battery,
-                           device.lastObservation.temperature,
-                           device.lastObservation.humidity];
-        
-        if (device.isScale)
-            label =  [NSString stringWithFormat:@"%@  ⚖%.2f", label,
-                      device.lastObservation.weight];
-    }
-    cell.textLabel.text = label;
+    BOOL showDetail = showDetails;
+    if (device.lastObservation && device.lastObservation.battery < 30.0)
+        showDetail = YES;
+    
+    NSString *name;
+    if (device.displayLabel && ![device.displayLabel isEqualToString:@""])
+        name = device.displayLabel;
+    else
+        name = device.name;
+    
+    UIColor *color = [UIColor blueColor];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@:  %@",
+                           name,
+                           [device statusString]];
     cell.textLabel.textColor = color;
     cell.textLabel.textAlignment = NSTextAlignmentLeft;
-    cell.accessoryView = nil;
+    
+    if (showDetail) {
+        NSString *detailName = [device.name isEqualToString:name] ? @"" : device.name;
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"      %@  %@",
+                                     detailName,
+                                     [device detailStatus]];
+    } else
+        cell.detailTextLabel.text = nil;
+    
+    switch (device.peripheral.state) {
+        case CBPeripheralStateConnecting:
+            break;
+        case CBPeripheralStateConnected: {
+            UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            aiv.frame = CGRectMake(0, 0,
+                                   cell.frame.size.height,
+                                   cell.frame.size.height);
+            [aiv startAnimating];
+            cell.accessoryView = aiv;
+        }
+        default:
+            ;
+    }
+    
+#ifdef notdef
+    UICircularProgressView *pv = [[UICircularProgressView alloc]
+                                  initWithFrame:CGRectInset(CGRectMake(0, 0,
+                                                                       cell.frame.size.height,
+                                                                       cell.frame.size.height),
+                                                            4, 4) ];
+    pv.backgroundColor = [UIColor greenColor];
+    cell.accessoryView = pv;
+#endif
     return cell;
 }
 
@@ -573,7 +621,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void)tableView:(UITableView *)tableView
 commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -603,5 +650,13 @@ moveRowAtIndexPath:(NSIndexPath *)fromIndexPath
 #endif
 }
 
+- (void)tableView:(UITableView *)tableView
+didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Device *device = [displayedDevices objectAtIndex:indexPath.row];
+    DeviceVC *dvc = [[DeviceVC alloc] initWithDevice:device];
+    dvc.view.frame = self.view.frame;
+    dvc.navigationItem.rightBarButtonItem = self.navigationItem.rightBarButtonItem;
+    [self.navigationController pushViewController:dvc animated:YES];
+}
 
 @end

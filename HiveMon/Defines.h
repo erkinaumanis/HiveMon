@@ -28,6 +28,7 @@
 
 // view tools
 
+#define LATER       0 // to be filled in later
 #define BELOW(r)    ((r).origin.y + (r).size.height)
 #define RIGHT(r)    ((r).origin.x + (r).size.width)
 

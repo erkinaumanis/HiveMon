@@ -20,6 +20,7 @@
 		FB3B59FD1EAE5EAC00DFE11A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB3B59FC1EAE5EAC00DFE11A /* Assets.xcassets */; };
 		FB3B5A0A1EAE706500DFE11A /* BlueToothMGR.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */; };
 		FB3B5A0D1EAE71E800DFE11A /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */; };
+		FB5CA0501F35051C00AADEBD /* DeviceVC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5CA04F1F35051C00AADEBD /* DeviceVC.m */; };
 		FB7394741EB6353200B8D289 /* Log.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7394731EB6353200B8D289 /* Log.m */; };
 		FB7394771EC09B1A00B8D289 /* UICircularProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7394761EC09B1A00B8D289 /* UICircularProgressView.m */; };
 		FBA7A5A71EB0DBE900E78BDD /* Observation.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA7A5A61EB0DBE900E78BDD /* Observation.m */; };
@@ -53,6 +54,8 @@
 		FB3B5A081EAE706500DFE11A /* BlueToothMGR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlueToothMGR.h; sourceTree = "<group>"; };
 		FB3B5A091EAE706500DFE11A /* BlueToothMGR.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlueToothMGR.m; sourceTree = "<group>"; };
 		FB3B5A0C1EAE71E800DFE11A /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		FB5CA04E1F35051C00AADEBD /* DeviceVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceVC.h; sourceTree = "<group>"; };
+		FB5CA04F1F35051C00AADEBD /* DeviceVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceVC.m; sourceTree = "<group>"; };
 		FB7394721EB6353200B8D289 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		FB7394731EB6353200B8D289 /* Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Log.m; sourceTree = "<group>"; };
 		FB7394751EC09B1A00B8D289 /* UICircularProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICircularProgressView.h; sourceTree = "<group>"; };
@@ -105,6 +108,8 @@
 				FB3B59F41EAE5EAC00DFE11A /* DevicesVC.m */,
 				FB03B6501EAF782700954A00 /* Device.h */,
 				FB03B6511EAF782700954A00 /* Device.m */,
+				FB5CA04E1F35051C00AADEBD /* DeviceVC.h */,
+				FB5CA04F1F35051C00AADEBD /* DeviceVC.m */,
 				FB03B6531EAF785E00954A00 /* Hive.h */,
 				FB03B6541EAF785E00954A00 /* Hive.m */,
 				FB03B6561EAF786800954A00 /* Apiary.h */,
@@ -235,6 +240,7 @@
 				FBA7A5AA1EB2296400E78BDD /* Export.m in Sources */,
 				FB03B6581EAF786800954A00 /* Apiary.m in Sources */,
 				FB3B59EF1EAE5EAC00DFE11A /* main.m in Sources */,
+				FB5CA0501F35051C00AADEBD /* DeviceVC.m in Sources */,
 				FB7394741EB6353200B8D289 /* Log.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

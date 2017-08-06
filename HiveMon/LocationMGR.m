@@ -115,7 +115,7 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    NSLog(@"%s didFailWithError", __PRETTY_FUNCTION__);
+    NSLog(@"location mgr error: %@", [error localizedDescription]);
     switch (error.code) {
         case kCLErrorLocationUnknown:
             if (awaitingLocation) {
@@ -134,6 +134,7 @@ didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
             }
             break;
         default:
+            NSLog(@"   location mgr error number %ld", (long)error.code);
             break;
     }
 }

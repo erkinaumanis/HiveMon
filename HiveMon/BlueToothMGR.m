@@ -58,27 +58,28 @@
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
     NSLog(@"%s: state: %ld", __PRETTY_FUNCTION__, (long)central.state);
-    NSString *err = nil;
+    NSString *status = nil;
     switch (central.state) {
         case CBManagerStatePoweredOn:
+            status = nil;
             break;
         case CBManagerStateUnknown:
-            err = @"Unknown bluetooth state";
+            status = @"Unknown bluetooth state";
             break;
         case CBManagerStateResetting:
             NSLog(@"Bluetooth resetting");
-//            err = @"Bluetooth resetting";
+//            status = @"Bluetooth resetting";
             return; // they will get back to us
         case CBManagerStateUnsupported:
-            err = @"Bluetooth unsupported";
+            status = @"Bluetooth unsupported";
             break;
         case CBManagerStateUnauthorized:
-            err = @"Bluetooth access unauthorized";
+            status = @"Bluetooth access unauthorized";
             break;
         case CBManagerStatePoweredOff:
-            err = @"Bluetooth powered off";
+            status = @"Bluetooth powered off";
     }
-    [blueDelegate updateBluetoothStatus: err];
+    [blueDelegate updateBluetoothStatus: status];
 }
 
 - (BOOL) scanable {
@@ -114,7 +115,7 @@
                                                selector:@selector(discon:)
                                                  userInfo:peripheral
                                                   repeats:NO];
-    //    [peripheral discoverServices:NULL];
+    [peripheral discoverServices:NULL];
 }
 
 - (void)discon:(id) p {
@@ -233,6 +234,7 @@ didDisconnectPeripheral:(CBPeripheral *)peripheral
                  error:(NSError *)error {
     NSLog(@"disconnect %@ %@", [self P:peripheral],
           error ? [error localizedDescription] : @"");
+    [blueDelegate updatePeripheralStatus];
 }
 
 - (void)centralManager:(CBCentralManager *)central
